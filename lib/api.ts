@@ -214,15 +214,63 @@ export class ApiClient {
     highRiskReports.forEach(report => {
       alerts.push({
         id: `alert-${report.id}`,
+        title: `Water Contamination Alert`,
         type: 'water_contamination',
         severity: 'high',
         message: `High water contamination detected in ${report.village}`,
+        village: report.village,
         reportId: report.id,
         timestamp: report.submittedAt,
+        createdAt: report.submittedAt,
         acknowledged: false,
         resolved: false
       })
     })
+
+    // Add some additional mock alerts for demonstration
+    const additionalAlerts = [
+      {
+        id: 'alert-disease-outbreak-1',
+        title: 'Disease Outbreak Alert',
+        type: 'disease_outbreak',
+        severity: 'critical',
+        message: 'Multiple cases of diarrhea reported in Village A',
+        village: 'Village A',
+        reportId: null,
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        acknowledged: false,
+        resolved: false
+      },
+      {
+        id: 'alert-water-shortage-1',
+        title: 'Water Shortage Alert',
+        type: 'water_shortage',
+        severity: 'medium',
+        message: 'Water supply running low in Village B',
+        village: 'Village B',
+        reportId: null,
+        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+        acknowledged: true,
+        resolved: false
+      },
+      {
+        id: 'alert-infrastructure-1',
+        title: 'Infrastructure Alert',
+        type: 'infrastructure',
+        severity: 'low',
+        message: 'Water pump maintenance required in Village C',
+        village: 'Village C',
+        reportId: null,
+        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+        acknowledged: true,
+        resolved: true
+      }
+    ]
+
+    alerts.push(...additionalAlerts)
     
     return alerts
   }

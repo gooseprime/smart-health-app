@@ -276,17 +276,20 @@ export function AlertsPanel() {
 
   // Filter alerts based on search and filters
   const filteredAlerts = alerts.filter(alert => {
-    const matchesSearch = alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         alert.village.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = (alert.title?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+                         (alert.village?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+                         (alert.message?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
     const matchesSeverity = severityFilter === "all" || alert.severity === severityFilter
     const matchesVillage = villageFilter === "all" || alert.village === villageFilter
-    const matchesDateRange = new Date(alert.createdAt) > new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000)
+    const matchesDateRange = alert.createdAt ? 
+      new Date(alert.createdAt) > new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000) : 
+      true
     
     return matchesSearch && matchesSeverity && matchesVillage && matchesDateRange
   })
 
   // Get unique villages for filter
-  const uniqueVillages = Array.from(new Set(alerts.map(alert => alert.village)))
+  const uniqueVillages = Array.from(new Set(alerts.map(alert => alert.village).filter(Boolean)))
 
   // Analytics data
   const alertAnalytics = {
