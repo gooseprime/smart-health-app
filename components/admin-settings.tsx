@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { AlertTriangle, Settings, Save, RotateCcw, MapPin, Bell, Plus, Trash2, Edit, Download, Upload, Users, Shield, Database, Activity, BarChart3, Clock, AlertCircle } from "lucide-react"
+import { AlertTriangle, Settings, Save, RotateCcw, MapPin, Bell, Plus, Trash2, Edit, Download, Upload, Users, Shield, Database, Activity, BarChart3, Clock, AlertCircle, EyeOff } from "lucide-react"
 import { apiClient } from "@/lib/api"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts"
 
