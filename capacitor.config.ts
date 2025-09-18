@@ -4,7 +4,30 @@ const config: CapacitorConfig = {
   appId: 'com.smarthealth.monitor',
   appName: 'Smart Health Monitor',
   webDir: 'out',
-  // Remove server config to use static files
+  server: {
+    androidScheme: 'https'
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      launchAutoHide: true,
+      backgroundColor: "#ffffff",
+      androidSplashResourceName: "splash",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: false,
+      androidSpinnerStyle: "large",
+      iosSpinnerStyle: "small",
+      spinnerColor: "#999999",
+      splashFullScreen: true,
+      splashImmersive: true,
+      layoutName: "launch_screen",
+      useDialog: true,
+    },
+    StatusBar: {
+      style: 'default',
+      backgroundColor: '#ffffff'
+    }
+  }
 };
 
 export default config;

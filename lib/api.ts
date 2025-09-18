@@ -1,499 +1,340 @@
 /**
- * Dummy API Endpoints
+ * API Client for Smart Health Monitor
  * 
- * This module provides mock API endpoints that simulate backend functionality.
- * When the real backend is ready, these can be easily replaced with actual
- * HTTP calls to the backend services.
+ * This module provides API endpoints that connect to the backend services.
+ * Handles authentication, data fetching, and error management.
  */
 
 import { Report, AlertRule, VillageSettings } from './data-layer'
 
-// Mock data storage (in a real app, this would be a database)
-let mockReports: Report[] = []
-let mockAlertRules: AlertRule[] = []
-let mockVillageSettings: VillageSettings[] = []
+// API Configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+const isDevelopment = process.env.NODE_ENV === 'development'
 
-// Simulate network delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+// Authentication token management
+let authToken: string | null = null
 
-// Mock authentication token
-let mockAuthToken: string | null = null
+// Get auth token from localStorage
+const getAuthToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('authToken')
+  }
+  return authToken
+}
+
+// Set auth token
+const setAuthToken = (token: string | null): void => {
+  authToken = token
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('authToken', token)
+    } else {
+      localStorage.removeItem('authToken')
+    }
+  }
+}
+
+// HTTP request helper
+const makeRequest = async <T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> => {
+  const token = getAuthToken()
+  
+  const config: RequestInit = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    },
+    ...options,
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config)
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data.data || data
+  } catch (error) {
+    console.error(`API Error [${endpoint}]:`, error)
+    throw error
+  }
+}
 
 export class ApiClient {
   private baseUrl: string
-  private apiKey?: string
 
-  constructor(baseUrl: string = '/api', apiKey?: string) {
+  constructor(baseUrl: string = API_BASE_URL) {
     this.baseUrl = baseUrl
-    this.apiKey = apiKey
   }
 
-  private async request<T>(
-    endpoint: string, 
-    options: RequestInit = {}
-  ): Promise<T> {
-    // Simulate network delay
-    await delay(500 + Math.random() * 1000)
-
-    // Simulate occasional network errors
-    if (Math.random() < 0.05) {
-      throw new Error('Network error: Unable to connect to server')
-    }
-
-    const url = `${this.baseUrl}${endpoint}`
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...options.headers as Record<string, string>
-    }
-
-    if (this.apiKey) {
-      headers['Authorization'] = `Bearer ${this.apiKey}`
-    }
-
-    const response = await fetch(url, {
-      ...options,
-      headers
+  // Authentication methods
+  async login(email: string, password: string): Promise<{ user: any; token: string }> {
+    const response = await makeRequest<{ user: any; token: string }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
     })
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`)
-    }
-
-    return response.json()
+    
+    setAuthToken(response.token)
+    return response
   }
 
-  // Authentication endpoints - using mock API for static export
-  async login(email: string, password: string): Promise<{ token: string; user: any }> {
-    return mockApi.login(email, password)
+  async register(userData: {
+    name: string
+    email: string
+    password: string
+    role?: string
+    village?: string
+    phone?: string
+  }): Promise<{ user: any; token: string }> {
+    const response = await makeRequest<{ user: any; token: string }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    })
+    
+    setAuthToken(response.token)
+    return response
   }
 
   async logout(): Promise<void> {
-    return mockApi.logout()
+    try {
+      await makeRequest('/auth/logout', { method: 'POST' })
+    } catch (error) {
+      console.warn('Logout request failed:', error)
+    } finally {
+      setAuthToken(null)
+    }
   }
 
   async getCurrentUser(): Promise<any> {
-    return mockApi.getCurrentUser()
+    return makeRequest<any>('/auth/me')
   }
 
-  // Reports endpoints - using mock API for static export
-  async getReports(): Promise<Report[]> {
-    return mockApi.getReports()
+  async refreshToken(): Promise<{ token: string }> {
+    const token = getAuthToken()
+    if (!token) {
+      throw new Error('No token to refresh')
+    }
+    
+    const response = await makeRequest<{ token: string }>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ token })
+    })
+    
+    setAuthToken(response.token)
+    return response
   }
 
-  async getReport(id: string): Promise<Report> {
-    const reports = await mockApi.getReports()
-    const report = reports.find(r => r.id === id)
-    if (!report) throw new Error('Report not found')
-    return report
+  // Reports endpoints
+  async getReports(filters?: {
+    status?: string
+    severity?: string
+    village?: string
+    dateFrom?: string
+    dateTo?: string
+    page?: number
+    limit?: number
+  }): Promise<{ reports: Report[]; pagination: any }> {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined) {
+          params.append(key, value.toString())
+        }
+      })
+    }
+    
+    const queryString = params.toString()
+    const endpoint = queryString ? `/reports?${queryString}` : '/reports'
+    
+    return makeRequest<{ reports: Report[]; pagination: any }>(endpoint)
   }
 
-  async createReport(report: Omit<Report, 'id' | 'submittedAt' | 'status'>): Promise<Report> {
-    return mockApi.createReport(report)
+  async createReport(reportData: Partial<Report>): Promise<Report> {
+    return makeRequest<Report>('/reports', {
+      method: 'POST',
+      body: JSON.stringify(reportData)
+    })
   }
 
-  async updateReport(id: string, updates: Partial<Report>): Promise<Report> {
-    return mockApi.updateReport(id, updates)
+  async updateReport(id: string, reportData: Partial<Report>): Promise<Report> {
+    return makeRequest<Report>(`/reports/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(reportData)
+    })
   }
 
   async deleteReport(id: string): Promise<void> {
-    return mockApi.deleteReport(id)
-  }
-
-  async exportReports(format: 'csv' | 'excel'): Promise<Blob> {
-    // Mock export functionality for static export
-    const reports = await mockApi.getReports()
-    const csvContent = reports.map(report => 
-      `${report.id},${report.patientName},${report.village},${report.symptoms.join(';')},${report.waterContamination}`
-    ).join('\n')
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' })
-    return blob
-  }
-
-  // Statistics endpoints - using mock API for static export
-  async getStatistics(): Promise<{
-    totalReports: number
-    recentReports: number
-    uniqueVillages: number
-    highRiskReports: number
-    waterQualityPercentage: number
-  }> {
-    return mockApi.getStatistics()
-  }
-
-  async getReportStats(): Promise<{
-    reportsByVillage: Record<string, number>
-    reportsByDate: Array<{ date: string; count: number }>
-    symptomFrequency: Record<string, number>
-    waterQualityDistribution: Record<string, number>
-  }> {
-    // Mock implementation for report stats
-    const reports = await mockApi.getReports()
-    const reportsByVillage: Record<string, number> = {}
-    const reportsByDate: Array<{ date: string; count: number }> = []
-    const symptomFrequency: Record<string, number> = {}
-    const waterQualityDistribution: Record<string, number> = {}
-
-    reports.forEach(report => {
-      // Count by village
-      reportsByVillage[report.village] = (reportsByVillage[report.village] || 0) + 1
-      
-      // Count symptoms
-      report.symptoms.forEach(symptom => {
-        symptomFrequency[symptom] = (symptomFrequency[symptom] || 0) + 1
-      })
-      
-      // Count water quality
-      waterQualityDistribution[report.waterContamination] = (waterQualityDistribution[report.waterContamination] || 0) + 1
+    return makeRequest<void>(`/reports/${id}`, {
+      method: 'DELETE'
     })
-
-    return {
-      reportsByVillage,
-      reportsByDate,
-      symptomFrequency,
-      waterQualityDistribution
-    }
   }
 
-  // Alert Rules endpoints - using mock API for static export
+  async getReportById(id: string): Promise<Report> {
+    return makeRequest<Report>(`/reports/${id}`)
+  }
+
+  async getReportStats(): Promise<any> {
+    return makeRequest<any>('/reports/stats')
+  }
+
+  async exportReports(format: 'csv' | 'json' = 'csv', filters?: any): Promise<any> {
+    const params = new URLSearchParams({ format, ...filters })
+    return makeRequest<any>(`/reports/export?${params.toString()}`)
+  }
+
+  // Alerts endpoints
+  async getAlerts(filters?: {
+    type?: string
+    severity?: string
+    village?: string
+    acknowledged?: boolean
+    resolved?: boolean
+    page?: number
+    limit?: number
+  }): Promise<{ alerts: any[]; pagination: any }> {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined) {
+          params.append(key, value.toString())
+        }
+      })
+    }
+    
+    const queryString = params.toString()
+    const endpoint = queryString ? `/alerts?${queryString}` : '/alerts'
+    
+    return makeRequest<{ alerts: any[]; pagination: any }>(endpoint)
+  }
+
+  async getAlertById(id: string): Promise<any> {
+    return makeRequest<any>(`/alerts/${id}`)
+  }
+
+  async acknowledgeAlert(id: string): Promise<void> {
+    return makeRequest<void>(`/alerts/${id}/acknowledge`, {
+      method: 'POST'
+    })
+  }
+
+  async resolveAlert(id: string, resolutionNotes?: string): Promise<void> {
+    return makeRequest<void>(`/alerts/${id}/resolve`, {
+      method: 'POST',
+      body: JSON.stringify({ resolutionNotes })
+    })
+  }
+
+  async deleteAlert(id: string): Promise<void> {
+    return makeRequest<void>(`/alerts/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async getAlertStats(): Promise<any> {
+    return makeRequest<any>('/alerts/stats')
+  }
+
+  async exportAlerts(format: 'csv' | 'json' = 'csv'): Promise<any> {
+    return makeRequest<any>(`/alerts/export?format=${format}`)
+  }
+
+  // Alert Rules endpoints
   async getAlertRules(): Promise<AlertRule[]> {
-    return mockApi.getAlertRules()
+    return makeRequest<AlertRule[]>('/admin/alert-rules')
   }
 
-  async createAlertRule(rule: Omit<AlertRule, 'id'>): Promise<AlertRule> {
-    const newRule: AlertRule = {
-      ...rule,
-      id: Date.now().toString(36) + Math.random().toString(36).substr(2)
-    }
-    const rules = await mockApi.getAlertRules()
-    rules.push(newRule)
-    await mockApi.saveAlertRules(rules)
-    return newRule
+  async createAlertRule(ruleData: Partial<AlertRule>): Promise<AlertRule> {
+    return makeRequest<AlertRule>('/admin/alert-rules', {
+      method: 'POST',
+      body: JSON.stringify(ruleData)
+    })
   }
 
-  async updateAlertRule(id: string, updates: Partial<AlertRule>): Promise<AlertRule> {
-    const rules = await mockApi.getAlertRules()
-    const index = rules.findIndex(r => r.id === id)
-    if (index === -1) throw new Error('Alert rule not found')
-    rules[index] = { ...rules[index], ...updates }
-    await mockApi.saveAlertRules(rules)
-    return rules[index]
+  async updateAlertRule(id: string, ruleData: Partial<AlertRule>): Promise<AlertRule> {
+    return makeRequest<AlertRule>(`/admin/alert-rules/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(ruleData)
+    })
   }
 
   async deleteAlertRule(id: string): Promise<void> {
-    const rules = await mockApi.getAlertRules()
-    const filteredRules = rules.filter(r => r.id !== id)
-    await mockApi.saveAlertRules(filteredRules)
-  }
-
-  // Village Settings endpoints - using mock API for static export
-  async getVillageSettings(): Promise<VillageSettings[]> {
-    return mockApi.getVillageSettings()
-  }
-
-  async updateVillageSettings(settings: VillageSettings[]): Promise<VillageSettings[]> {
-    await mockApi.saveVillageSettings(settings)
-    return settings
-  }
-
-  async getVillageSetting(villageName: string): Promise<VillageSettings> {
-    const settings = await mockApi.getVillageSettings()
-    const setting = settings.find(s => s.name === villageName)
-    if (!setting) throw new Error('Village setting not found')
-    return setting
-  }
-
-  // Alerts endpoints - using mock API for static export
-  async getAlerts(): Promise<any[]> {
-    // Mock alerts based on reports
-    const reports = await mockApi.getReports()
-    const alerts = []
-    
-    // Generate alerts based on high-risk reports
-    const highRiskReports = reports.filter(r => r.waterContamination === 'high')
-    highRiskReports.forEach(report => {
-      alerts.push({
-        id: `alert-${report.id}`,
-        title: `Water Contamination Alert`,
-        type: 'water_contamination',
-        severity: 'high',
-        message: `High water contamination detected in ${report.village}`,
-        village: report.village,
-        reportId: report.id,
-        timestamp: report.submittedAt,
-        createdAt: report.submittedAt,
-        acknowledged: false,
-        resolved: false
-      })
+    return makeRequest<void>(`/admin/alert-rules/${id}`, {
+      method: 'DELETE'
     })
-
-    // Add some additional mock alerts for demonstration
-    const additionalAlerts = [
-      {
-        id: 'alert-disease-outbreak-1',
-        title: 'Disease Outbreak Alert',
-        type: 'disease_outbreak',
-        severity: 'critical',
-        message: 'Multiple cases of diarrhea reported in Village A',
-        village: 'Village A',
-        reportId: null,
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        acknowledged: false,
-        resolved: false
-      },
-      {
-        id: 'alert-water-shortage-1',
-        title: 'Water Shortage Alert',
-        type: 'water_shortage',
-        severity: 'medium',
-        message: 'Water supply running low in Village B',
-        village: 'Village B',
-        reportId: null,
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-        acknowledged: true,
-        resolved: false
-      },
-      {
-        id: 'alert-infrastructure-1',
-        title: 'Infrastructure Alert',
-        type: 'infrastructure',
-        severity: 'low',
-        message: 'Water pump maintenance required in Village C',
-        village: 'Village C',
-        reportId: null,
-        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-        acknowledged: true,
-        resolved: true
-      }
-    ]
-
-    alerts.push(...additionalAlerts)
-    
-    return alerts
   }
 
-  async acknowledgeAlert(alertId: string): Promise<void> {
-    // Mock acknowledgment - in a real app, this would update the alert status
-    await delay(200)
-  }
-
-  async resolveAlert(alertId: string): Promise<void> {
-    // Mock resolution - in a real app, this would update the alert status
-    await delay(200)
-  }
-
-  // Health check endpoint - using mock API for static export
-  async healthCheck(): Promise<{ status: string; timestamp: string }> {
-    return {
-      status: 'healthy',
-      timestamp: new Date().toISOString()
-    }
-  }
-}
-
-// Mock API implementation functions
-export const mockApi = {
-  // Reports
-  async getReports(): Promise<Report[]> {
-    await delay(300)
-    return [...mockReports]
-  },
-
-  async createReport(report: Omit<Report, 'id' | 'submittedAt' | 'status'>): Promise<Report> {
-    await delay(500)
-    const newReport: Report = {
-      ...report,
-      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-      submittedAt: new Date().toISOString(),
-      status: 'submitted'
-    }
-    mockReports.push(newReport)
-    return newReport
-  },
-
-  async updateReport(id: string, updates: Partial<Report>): Promise<Report> {
-    await delay(400)
-    const index = mockReports.findIndex(r => r.id === id)
-    if (index === -1) throw new Error('Report not found')
-    mockReports[index] = { ...mockReports[index], ...updates }
-    return mockReports[index]
-  },
-
-  async deleteReport(id: string): Promise<void> {
-    await delay(300)
-    mockReports = mockReports.filter(r => r.id !== id)
-  },
-
-  // Statistics
-  async getStatistics() {
-    await delay(200)
-    const totalReports = mockReports.length
-    const recentReports = mockReports.filter(
-      (report) => new Date(report.submittedAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    ).length
-    const uniqueVillages = new Set(mockReports.map((report) => report.village)).size
-    const highRiskReports = mockReports.filter((report) => report.waterContamination === "high").length
-    const waterQualityPercentage = mockReports.length > 0
-      ? Math.round((mockReports.filter((r) => r.waterContamination !== "high").length / mockReports.length) * 100)
-      : 0
-
-    return {
-      totalReports,
-      recentReports,
-      uniqueVillages,
-      highRiskReports,
-      waterQualityPercentage
-    }
-  },
-
-  // Alert Rules
-  async getAlertRules(): Promise<AlertRule[]> {
-    await delay(200)
-    return [...mockAlertRules]
-  },
-
-  async saveAlertRules(rules: AlertRule[]): Promise<void> {
-    await delay(300)
-    mockAlertRules = [...rules]
-  },
-
-  // Village Settings
+  // Village Settings endpoints
   async getVillageSettings(): Promise<VillageSettings[]> {
-    await delay(200)
-    return [...mockVillageSettings]
-  },
+    return makeRequest<VillageSettings[]>('/admin/village-settings')
+  }
 
-  async saveVillageSettings(settings: VillageSettings[]): Promise<void> {
-    await delay(300)
-    mockVillageSettings = [...settings]
-  },
+  async getVillageSetting(id: string): Promise<VillageSettings> {
+    return makeRequest<VillageSettings>(`/admin/village-settings/${id}`)
+  }
 
-  // Authentication
-  async login(email: string, password: string) {
-    await delay(800)
-    if (email === 'admin@health.gov' && password === 'admin123') {
-      mockAuthToken = 'mock-jwt-token-' + Date.now()
-      return {
-        token: mockAuthToken,
-        user: {
-          id: '1',
-          email: 'admin@health.gov',
-          name: 'Health Administrator',
-          role: 'admin'
-        }
-      }
-    }
-    throw new Error('Invalid credentials')
-  },
+  async createVillageSettings(settingsData: Partial<VillageSettings>): Promise<VillageSettings> {
+    return makeRequest<VillageSettings>('/admin/village-settings', {
+      method: 'POST',
+      body: JSON.stringify(settingsData)
+    })
+  }
 
-  async logout() {
-    await delay(200)
-    mockAuthToken = null
-  },
+  async updateVillageSettings(id: string, settingsData: Partial<VillageSettings>): Promise<VillageSettings> {
+    return makeRequest<VillageSettings>(`/admin/village-settings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(settingsData)
+    })
+  }
 
-  async getCurrentUser() {
-    await delay(100)
-    if (!mockAuthToken) {
-      throw new Error('Not authenticated')
-    }
-    return {
-      id: '1',
-      email: 'admin@health.gov',
-      name: 'Health Administrator',
-      role: 'admin'
-    }
+  async deleteVillageSettings(id: string): Promise<void> {
+    return makeRequest<void>(`/admin/village-settings/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  // System Settings endpoints
+  async getSystemSettings(): Promise<any> {
+    return makeRequest<any>('/admin/system-settings')
+  }
+
+  async updateSystemSettings(settings: any): Promise<any> {
+    return makeRequest<any>('/admin/system-settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings)
+    })
+  }
+
+  // Analytics endpoints
+  async getAnalyticsOverview(): Promise<any> {
+    return makeRequest<any>('/admin/analytics/overview')
+  }
+
+  async getReportAnalytics(): Promise<any> {
+    return makeRequest<any>('/admin/analytics/reports')
+  }
+
+  async getAlertAnalytics(): Promise<any> {
+    return makeRequest<any>('/admin/analytics/alerts')
+  }
+
+  async getVillageAnalytics(): Promise<any> {
+    return makeRequest<any>('/admin/analytics/villages')
+  }
+
+  // Health check
+  async healthCheck(): Promise<{ status: string; timestamp: string }> {
+    return makeRequest<{ status: string; timestamp: string }>('/health')
   }
 }
 
-// Initialize with some mock data
-export const initializeMockData = () => {
-  // Add some sample reports
-  mockReports = [
-    {
-      id: "1",
-      patientName: "John Doe",
-      age: "35",
-      village: "Riverside Village",
-      symptoms: ["Diarrhea", "Fever", "Nausea"],
-      waterTurbidity: "15.2",
-      waterPH: "6.8",
-      waterContamination: "medium",
-      notes: "Patient reports symptoms started 3 days ago",
-      submittedBy: "Health Worker",
-      submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "submitted",
-    },
-    {
-      id: "2",
-      patientName: "Jane Smith",
-      age: "28",
-      village: "Mountain View",
-      symptoms: ["Vomiting", "Abdominal Pain"],
-      waterTurbidity: "22.1",
-      waterPH: "7.2",
-      waterContamination: "high",
-      notes: "Severe symptoms, referred to clinic",
-      submittedBy: "Health Worker",
-      submittedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      status: "submitted",
-    }
-  ]
-
-  // Add default alert rules
-  mockAlertRules = [
-    {
-      id: "outbreak-diarrhea",
-      name: "Diarrhea Outbreak",
-      description: "More than 5 diarrhea cases in a village within 7 days",
-      condition: "symptom_count",
-      threshold: 5,
-      severity: "high",
-      isActive: true,
-    },
-    {
-      id: "water-contamination",
-      name: "High Water Contamination",
-      description: "Water contamination level marked as high",
-      condition: "water_quality",
-      threshold: 1,
-      severity: "critical",
-      isActive: true,
-    }
-  ]
-
-  // Add default village settings
-  mockVillageSettings = [
-    {
-      name: "Riverside Village",
-      severity: "high",
-      customThresholds: {
-        outbreakThreshold: 5,
-        waterQualityThreshold: 1,
-        alertFrequency: 24
-      },
-      isCustomized: false
-    },
-    {
-      name: "Mountain View",
-      severity: "critical",
-      customThresholds: {
-        outbreakThreshold: 3,
-        waterQualityThreshold: 1,
-        alertFrequency: 12
-      },
-      isCustomized: false
-    }
-  ]
-}
-
-// Initialize mock data
-initializeMockData()
-
-// Create a default API client instance
+// Create and export a singleton instance
 export const apiClient = new ApiClient()
 
-// Export types for use in other modules
-export type { Report, AlertRule, VillageSettings }
+// Export for backward compatibility
+export default apiClient
