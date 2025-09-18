@@ -15,7 +15,7 @@ const nextConfig = {
     esmExternals: false,
   },
   // Add asset prefix for static export
-  assetPrefix: './',
+  assetPrefix: '',
   // Disable image optimization
   images: {
     unoptimized: true,
