@@ -45,6 +45,8 @@ import {
   LineChart as LineChartIcon
 } from "lucide-react"
 import { MapVisualization } from "./map-visualization"
+import { EducationalModules } from "./educational-modules"
+import { MultilingualSupport } from "./multilingual-support"
 import { dataLayer } from "@/lib/data-layer"
 import { apiClient } from "@/lib/api"
 
@@ -442,7 +444,7 @@ export function Dashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-7 bg-muted/50 p-1 rounded-xl">
             <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <BarChart3 className="w-4 h-4" />
               Overview
@@ -459,9 +461,17 @@ export function Dashboard() {
               <Droplets className="w-4 h-4" />
               Water Quality
             </TabsTrigger>
+            <TabsTrigger value="education" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Shield className="w-4 h-4" />
+              Education
+            </TabsTrigger>
+            <TabsTrigger value="languages" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Users className="w-4 h-4" />
+              Languages
+            </TabsTrigger>
             <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
               <FileText className="w-4 h-4" />
-              Recent Reports
+              Reports
             </TabsTrigger>
           </TabsList>
 
@@ -885,6 +895,16 @@ export function Dashboard() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Educational Modules Tab */}
+        <TabsContent value="education" className="space-y-6">
+          <EducationalModules />
+        </TabsContent>
+
+        {/* Multilingual Support Tab */}
+        <TabsContent value="languages" className="space-y-6">
+          <MultilingualSupport />
         </TabsContent>
         </Tabs>
       </div>

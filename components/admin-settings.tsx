@@ -212,12 +212,14 @@ export function AdminSettings() {
   const loadSettings = async () => {
     setIsLoading(true)
     try {
-      const [rulesData, villagesData] = await Promise.all([
+      const [rulesData, villagesData, statsData] = await Promise.all([
         apiClient.getAlertRules(),
-        apiClient.getVillageSettings()
+        apiClient.getVillageSettings(),
+        apiClient.getAlertStats()
       ])
-      setAlertRules(rulesData)
-      setVillageSettings(villagesData)
+      setAlertRules(rulesData || [])
+      setVillageSettings(villagesData || [])
+      setAnalyticsData(statsData || {})
     } catch (error) {
       console.error("Error loading settings:", error)
       // Fallback to localStorage
@@ -226,10 +228,15 @@ export function AdminSettings() {
       
       if (savedRules) {
         setAlertRules(JSON.parse(savedRules))
+      } else {
+        setAlertRules(defaultAlertRules)
       }
       if (savedVillages) {
         setVillageSettings(JSON.parse(savedVillages))
+      } else {
+        setVillageSettings(defaultVillageSettings)
       }
+      setAnalyticsData(generateMockAnalytics())
     }
     setIsLoading(false)
   }
@@ -331,22 +338,43 @@ export function AdminSettings() {
     setHasChanges(true)
   }
 
-  const exportSettings = () => {
-    const settings = {
-      alertRules,
-      villageSettings,
-      systemSettings,
-      exportedAt: new Date().toISOString()
+  const exportSettings = async () => {
+    try {
+      const settings = {
+        alertRules,
+        villageSettings,
+        systemSettings,
+        analytics: analyticsData,
+        exportedAt: new Date().toISOString(),
+        version: '2.1.0',
+        features: {
+          aiPatternDetection: true,
+          waterQualityMonitoring: true,
+          multilingualSupport: true,
+          realTimeAlerts: true,
+          educationalModules: true
+        }
+      }
+      
+      const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `smart-health-admin-settings-${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      // Also save to backend if available
+      try {
+        await apiClient.exportSettings(settings)
+      } catch (error) {
+        console.warn('Backend export failed, using local export only')
+      }
+    } catch (error) {
+      console.error('Error exporting settings:', error)
     }
-    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `admin-settings-${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
   }
 
   const importSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -471,10 +499,12 @@ export function AdminSettings() {
       )}
 
       <Tabs defaultValue="alert-rules" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="alert-rules">Alert Rules</TabsTrigger>
           <TabsTrigger value="village-settings">Village Settings</TabsTrigger>
           <TabsTrigger value="system-settings">System Settings</TabsTrigger>
+          <TabsTrigger value="ai-ml">AI/ML Config</TabsTrigger>
+          <TabsTrigger value="water-quality">Water Quality</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
@@ -936,6 +966,298 @@ export function AdminSettings() {
                     }))}
                     min="1"
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* AI/ML Configuration Tab */}
+        <TabsContent value="ai-ml" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Activity className="w-5 h-5" />
+                <span>AI/ML Pattern Detection</span>
+              </CardTitle>
+              <CardDescription>
+                Configure AI models for outbreak prediction and pattern detection
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="ai-enabled">AI Pattern Detection</Label>
+                    <p className="text-sm text-muted-foreground">Enable AI-powered outbreak prediction</p>
+                  </div>
+                  <Switch
+                    checked={systemSettings.ai?.enabled || false}
+                    onCheckedChange={(checked) => setSystemSettings(prev => ({
+                      ...prev,
+                      ai: {
+                        ...prev.ai,
+                        enabled: checked
+                      }
+                    }))}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="confidence-threshold">Confidence Threshold (%)</Label>
+                  <Input
+                    id="confidence-threshold"
+                    type="number"
+                    value={systemSettings.ai?.confidenceThreshold || 75}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      ai: {
+                        ...prev.ai,
+                        confidenceThreshold: parseInt(e.target.value)
+                      }
+                    }))}
+                    min="50"
+                    max="95"
+                  />
+                  <p className="text-sm text-muted-foreground">Minimum confidence level for AI predictions</p>
+                </div>
+
+                <div>
+                  <Label htmlFor="model-version">AI Model Version</Label>
+                  <Select
+                    value={systemSettings.ai?.modelVersion || 'SmartHealth-v2.1'}
+                    onValueChange={(value) => setSystemSettings(prev => ({
+                      ...prev,
+                      ai: {
+                        ...prev.ai,
+                        modelVersion: value
+                      }
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SmartHealth-v2.1">SmartHealth v2.1 (Latest)</SelectItem>
+                      <SelectItem value="SmartHealth-v2.0">SmartHealth v2.0</SelectItem>
+                      <SelectItem value="SmartHealth-v1.5">SmartHealth v1.5</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pattern Detection Features</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.ai?.features?.outbreakPrediction || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          ai: {
+                            ...prev.ai,
+                            features: {
+                              ...prev.ai?.features,
+                              outbreakPrediction: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>Outbreak Prediction</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.ai?.features?.waterContamination || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          ai: {
+                            ...prev.ai,
+                            features: {
+                              ...prev.ai?.features,
+                              waterContamination: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>Water Contamination Detection</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.ai?.features?.seasonalTrends || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          ai: {
+                            ...prev.ai,
+                            features: {
+                              ...prev.ai?.features,
+                              seasonalTrends: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>Seasonal Trend Analysis</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.ai?.features?.riskAssessment || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          ai: {
+                            ...prev.ai,
+                            features: {
+                              ...prev.ai?.features,
+                              riskAssessment: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>Risk Assessment</Label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Water Quality Monitoring Tab */}
+        <TabsContent value="water-quality" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <MapPin className="w-5 h-5" />
+                <span>Water Quality Monitoring</span>
+              </CardTitle>
+              <CardDescription>
+                Configure water quality sensors and testing protocols
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="water-monitoring">Water Quality Monitoring</Label>
+                    <p className="text-sm text-muted-foreground">Enable automated water quality monitoring</p>
+                  </div>
+                  <Switch
+                    checked={systemSettings.waterQuality?.enabled || false}
+                    onCheckedChange={(checked) => setSystemSettings(prev => ({
+                      ...prev,
+                      waterQuality: {
+                        ...prev.waterQuality,
+                        enabled: checked
+                      }
+                    }))}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="testing-frequency">Testing Frequency (hours)</Label>
+                  <Input
+                    id="testing-frequency"
+                    type="number"
+                    value={systemSettings.waterQuality?.testingFrequency || 24}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      waterQuality: {
+                        ...prev.waterQuality,
+                        testingFrequency: parseInt(e.target.value)
+                      }
+                    }))}
+                    min="1"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Water Quality Parameters</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.waterQuality?.parameters?.turbidity || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          waterQuality: {
+                            ...prev.waterQuality,
+                            parameters: {
+                              ...prev.waterQuality?.parameters,
+                              turbidity: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>Turbidity</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.waterQuality?.parameters?.ph || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          waterQuality: {
+                            ...prev.waterQuality,
+                            parameters: {
+                              ...prev.waterQuality?.parameters,
+                              ph: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>pH Level</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.waterQuality?.parameters?.bacteria || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          waterQuality: {
+                            ...prev.waterQuality,
+                            parameters: {
+                              ...prev.waterQuality?.parameters,
+                              bacteria: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>Bacterial Presence</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        checked={systemSettings.waterQuality?.parameters?.chlorine || false}
+                        onCheckedChange={(checked) => setSystemSettings(prev => ({
+                          ...prev,
+                          waterQuality: {
+                            ...prev.waterQuality,
+                            parameters: {
+                              ...prev.waterQuality?.parameters,
+                              chlorine: checked
+                            }
+                          }
+                        }))}
+                      />
+                      <Label>Chlorine Level</Label>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="contamination-threshold">Contamination Alert Threshold</Label>
+                  <Select
+                    value={systemSettings.waterQuality?.contaminationThreshold || 'medium'}
+                    onValueChange={(value) => setSystemSettings(prev => ({
+                      ...prev,
+                      waterQuality: {
+                        ...prev.waterQuality,
+                        contaminationThreshold: value
+                      }
+                    }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low (Immediate Alert)</SelectItem>
+                      <SelectItem value="medium">Medium (Standard Alert)</SelectItem>
+                      <SelectItem value="high">High (Delayed Alert)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>
