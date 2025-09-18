@@ -202,6 +202,7 @@ export function AdminSettings() {
   const [hasChanges, setHasChanges] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [analyticsData, setAnalyticsData] = useState<any>({})
   const [editingRule, setEditingRule] = useState<string | null>(null)
   const [newRule, setNewRule] = useState<Partial<AlertRule>>({})
 
@@ -234,11 +235,36 @@ export function AdminSettings() {
       if (savedVillages) {
         setVillageSettings(JSON.parse(savedVillages))
       } else {
-        setVillageSettings(defaultVillageSettings)
+        setVillageSettings(defaultVillages)
       }
       setAnalyticsData(generateMockAnalytics())
     }
     setIsLoading(false)
+  }
+
+  const generateMockAnalytics = () => {
+    return {
+      totalRules: alertRules.length,
+      activeRules: alertRules.filter(rule => rule.isActive).length,
+      totalVillages: villageSettings.length,
+      customizedVillages: villageSettings.filter(village => village.isCustomized).length,
+      ruleUsage: alertRules.map(rule => ({
+        name: rule.name,
+        usage: Math.floor(Math.random() * 100),
+        severity: rule.severity
+      })),
+      villageDistribution: villageSettings.map(village => ({
+        name: village.name,
+        severity: village.severity,
+        threshold: village.customThresholds.outbreakThreshold
+      })),
+      systemHealth: {
+        uptime: '99.9%',
+        responseTime: '120ms',
+        errorRate: '0.1%',
+        activeUsers: Math.floor(Math.random() * 50) + 20
+      }
+    }
   }
 
   const updateAlertRule = (ruleId: string, field: keyof AlertRule, value: any) => {
@@ -397,19 +423,6 @@ export function AdminSettings() {
     }
   }
 
-  // Analytics data
-  const analyticsData = {
-    ruleUsage: alertRules.map(rule => ({
-      name: rule.name,
-      active: rule.isActive ? 1 : 0,
-      severity: rule.severity
-    })),
-    villageDistribution: villageSettings.map(village => ({
-      name: village.name,
-      severity: village.severity,
-      customized: village.isCustomized ? 1 : 0
-    }))
-  }
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {

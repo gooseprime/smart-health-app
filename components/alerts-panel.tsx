@@ -77,6 +77,7 @@ export function AlertsPanel() {
   const [alerts, setAlerts] = useState<HealthAlert[]>([])
   const [alertRules, setAlertRules] = useState<AlertRule[]>(defaultAlertRules)
   const [reports, setReports] = useState<any[]>([])
+  const [analyticsData, setAnalyticsData] = useState<any>({})
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [severityFilter, setSeverityFilter] = useState<string>("all")
@@ -260,6 +261,33 @@ export function AlertsPanel() {
       
     } catch (error) {
       console.error('Error in AI pattern detection:', error)
+    }
+  }
+
+  const generateMockAnalytics = () => {
+    return {
+      totalAlerts: alerts.length,
+      activeAlerts: alerts.filter(alert => alert.status === 'active').length,
+      resolvedAlerts: alerts.filter(alert => alert.status === 'resolved').length,
+      severityDistribution: {
+        critical: alerts.filter(alert => alert.severity === 'critical').length,
+        high: alerts.filter(alert => alert.severity === 'high').length,
+        medium: alerts.filter(alert => alert.severity === 'medium').length,
+        low: alerts.filter(alert => alert.severity === 'low').length,
+      },
+      villageDistribution: alerts.reduce((acc, alert) => {
+        acc[alert.village] = (acc[alert.village] || 0) + 1
+        return acc
+      }, {} as Record<string, number>),
+      recentTrends: [
+        { date: '2024-01-10', count: 5 },
+        { date: '2024-01-11', count: 8 },
+        { date: '2024-01-12', count: 12 },
+        { date: '2024-01-13', count: 15 },
+        { date: '2024-01-14', count: 18 },
+        { date: '2024-01-15', count: 22 },
+        { date: '2024-01-16', count: alerts.length },
+      ]
     }
   }
 

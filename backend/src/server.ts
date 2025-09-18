@@ -50,15 +50,36 @@ app.use(helmet({
   },
 }))
 
-// Rate limiting
-const limiter = rateLimit({
+// Rate limiting with different limits for different endpoints
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for health checks
+    return req.path === '/health'
+  }
 })
-app.use(limiter)
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 auth requests per windowMs
+  message: 'Too many authentication attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+const reportLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // limit each IP to 50 report requests per windowMs
+  message: 'Too many report requests, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+app.use(generalLimiter)
 
 // CORS configuration
 app.use(cors({
@@ -84,21 +105,82 @@ app.use(morgan('combined', {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({
+  const healthCheck = {
     status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
-  })
+    environment: process.env.NODE_ENV || 'development',
+    version: process.env.npm_package_version || '1.0.0',
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100,
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100,
+      external: Math.round(process.memoryUsage().external / 1024 / 1024 * 100) / 100
+    },
+    cpu: {
+      usage: process.cpuUsage()
+    }
+  }
+  
+  res.status(200).json(healthCheck)
 })
 
-// API routes
-app.use('/api/auth', authRoutes)
-app.use('/api/reports', reportRoutes)
-app.use('/api/alerts', alertRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/users', userRoutes)
-app.use('/api/villages', villageRoutes)
+// Detailed health check endpoint
+app.get('/health/detailed', async (req, res) => {
+  try {
+    const mongoose = require('mongoose')
+    const dbState = mongoose.connection.readyState
+    const dbStates = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting'
+    }
+
+    const healthCheck = {
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development',
+      version: process.env.npm_package_version || '1.0.0',
+      database: {
+        status: dbStates[dbState as keyof typeof dbStates],
+        readyState: dbState
+      },
+      memory: {
+        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100,
+        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100,
+        external: Math.round(process.memoryUsage().external / 1024 / 1024 * 100) / 100,
+        rss: Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100
+      },
+      cpu: {
+        usage: process.cpuUsage(),
+        loadAverage: process.platform !== 'win32' ? require('os').loadavg() : [0, 0, 0]
+      },
+      system: {
+        platform: process.platform,
+        arch: process.arch,
+        nodeVersion: process.version,
+        pid: process.pid
+      }
+    }
+    
+    res.status(200).json(healthCheck)
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      timestamp: new Date().toISOString(),
+      error: 'Health check failed'
+    })
+  }
+})
+
+// API routes with specific rate limiting
+app.use('/api/auth', authLimiter, authRoutes)
+app.use('/api/reports', reportLimiter, reportRoutes)
+app.use('/api/alerts', generalLimiter, alertRoutes)
+app.use('/api/admin', generalLimiter, adminRoutes)
+app.use('/api/users', generalLimiter, userRoutes)
+app.use('/api/villages', generalLimiter, villageRoutes)
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {

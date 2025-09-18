@@ -290,20 +290,19 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Enhanced Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 p-8 text-white">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+    <div className="space-y-6">
+      {/* Clean Header */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-                <BarChart3 className="w-6 h-6" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <BarChart3 className="w-6 h-6 text-blue-600" />
               </div>
-              <h1 className="text-3xl font-bold">Health Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Health Dashboard</h1>
             </div>
-            <p className="text-blue-100 text-lg">Monitor community health trends and water quality in real-time</p>
-            <div className="flex items-center gap-4 text-sm text-blue-200">
+            <p className="text-gray-600 text-lg">Monitor community health trends and water quality in real-time</p>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
                 Last updated: {new Date().toLocaleTimeString()}
@@ -317,23 +316,23 @@ export function Dashboard() {
           <div className="flex flex-wrap gap-3">
             <Button 
               onClick={refreshData} 
-              variant="secondary" 
+              variant="outline" 
               size="sm"
               disabled={isRefreshing}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+              className="border-gray-300 hover:border-blue-600 hover:bg-blue-50"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button onClick={loadDataFromAPI} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+            <Button onClick={loadDataFromAPI} variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Activity className="w-4 h-4 mr-2" />
               Load Data
             </Button>
-            <Button onClick={() => exportReports('csv')} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+            <Button onClick={() => exportReports('csv')} variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Download className="w-4 h-4 mr-2" />
               CSV
             </Button>
-            <Button onClick={() => exportReports('excel')} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+            <Button onClick={() => exportReports('excel')} variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Download className="w-4 h-4 mr-2" />
               Excel
             </Button>
@@ -341,19 +340,18 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Enhanced Key Metrics */}
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Reports Card */}
-        <Card className="group relative overflow-hidden border border-blue-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-blue-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-            <CardTitle className="text-sm font-semibold text-blue-700">Total Reports</CardTitle>
-            <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+        <Card className="border border-gray-200 bg-white hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Reports</CardTitle>
+            <div className="p-2 bg-blue-100 rounded-lg">
               <FileText className="h-5 w-5 text-blue-600" />
             </div>
           </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold text-blue-900 mb-1">{totalReports}</div>
+          <CardContent>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{totalReports}</div>
             <div className="flex items-center gap-1 text-sm">
               <TrendingUp className="h-3 w-3 text-green-600" />
               <span className="text-green-600 font-medium">+{recentReports.length}</span>
@@ -363,16 +361,15 @@ export function Dashboard() {
         </Card>
 
         {/* Villages Monitored Card */}
-        <Card className="group relative overflow-hidden border border-green-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-green-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-green-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-            <CardTitle className="text-sm font-semibold text-green-700">Villages Monitored</CardTitle>
-            <div className="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+        <Card className="border border-gray-200 bg-white hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Villages Monitored</CardTitle>
+            <div className="p-2 bg-green-100 rounded-lg">
               <MapPin className="h-5 w-5 text-green-600" />
             </div>
           </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold text-green-900 mb-1">{uniqueVillages}</div>
+          <CardContent>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{uniqueVillages}</div>
             <div className="flex items-center gap-1 text-sm">
               <Shield className="h-3 w-3 text-green-600" />
               <span className="text-green-600 font-medium">Active</span>
@@ -382,16 +379,15 @@ export function Dashboard() {
         </Card>
 
         {/* High Risk Areas Card */}
-        <Card className="group relative overflow-hidden border border-red-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-red-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-red-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-            <CardTitle className="text-sm font-semibold text-red-700">High Risk Areas</CardTitle>
-            <div className="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+        <Card className="border border-gray-200 bg-white hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">High Risk Areas</CardTitle>
+            <div className="p-2 bg-red-100 rounded-lg">
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
           </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold text-red-900 mb-1">{highRiskReports}</div>
+          <CardContent>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{highRiskReports}</div>
             <div className="flex items-center gap-1 text-sm">
               <AlertTriangle className="h-3 w-3 text-red-600" />
               <span className="text-red-600 font-medium">Critical</span>
@@ -401,16 +397,15 @@ export function Dashboard() {
         </Card>
 
         {/* Water Quality Card */}
-        <Card className="group relative overflow-hidden border border-cyan-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-cyan-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-            <CardTitle className="text-sm font-semibold text-cyan-700">Water Quality</CardTitle>
-            <div className="p-2 bg-cyan-100 rounded-lg group-hover:bg-cyan-200 transition-colors">
+        <Card className="border border-gray-200 bg-white hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Water Quality</CardTitle>
+            <div className="p-2 bg-cyan-100 rounded-lg">
               <Droplets className="h-5 w-5 text-cyan-600" />
             </div>
           </CardHeader>
-          <CardContent className="relative">
-            <div className="text-3xl font-bold text-cyan-900 mb-1">
+          <CardContent>
+            <div className="text-3xl font-bold text-gray-900 mb-1">
               {reports.length > 0
                 ? Math.round((reports.filter((r) => r.waterContamination !== "high").length / reports.length) * 100)
                 : 0}%
@@ -424,19 +419,19 @@ export function Dashboard() {
         </Card>
       </div>
 
-      {/* Enhanced Tabs Section */}
+      {/* Analytics Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Analytics & Reports</h2>
-            <p className="text-muted-foreground">Comprehensive health data visualization and insights</p>
+            <h2 className="text-2xl font-bold text-gray-900">Analytics & Reports</h2>
+            <p className="text-gray-600">Comprehensive health data visualization and insights</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Filter className="w-4 h-4 mr-2" />
               Filter
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Calendar className="w-4 h-4 mr-2" />
               Date Range
             </Button>
@@ -444,32 +439,32 @@ export function Dashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-muted/50 p-1 rounded-xl">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-gray-100 p-1 rounded-lg">
+            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <BarChart3 className="w-4 h-4" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="map" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="map" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <MapPin className="w-4 h-4" />
               Map View
             </TabsTrigger>
-            <TabsTrigger value="symptoms" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="symptoms" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <Activity className="w-4 h-4" />
               Symptoms
             </TabsTrigger>
-            <TabsTrigger value="water" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="water" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <Droplets className="w-4 h-4" />
               Water Quality
             </TabsTrigger>
-            <TabsTrigger value="education" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="education" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <Shield className="w-4 h-4" />
               Education
             </TabsTrigger>
-            <TabsTrigger value="languages" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="languages" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <Users className="w-4 h-4" />
               Languages
             </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
               <FileText className="w-4 h-4" />
               Reports
             </TabsTrigger>

@@ -1,35 +1,153 @@
 import { Request, Response, NextFunction } from 'express'
-import { Report } from '../models/Report'
-import { Alert } from '../models/Alert'
+import { body, param, query } from 'express-validator'
 import { createError } from '../middleware/errorHandler'
 import { logger } from '../utils/logger'
 import { AuthRequest } from '../middleware/auth'
+import { validate } from '../middleware/validateRequest'
+import { reportService, ReportFilters, PaginationOptions } from '../services/ReportService'
 
 export class ReportController {
+  // Validation methods
+  static validateCreateReport = validate([
+    body('patientName')
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Patient name must be between 2 and 100 characters'),
+    body('age')
+      .isInt({ min: 0, max: 150 })
+      .withMessage('Age must be a valid number between 0 and 150'),
+    body('gender')
+      .isIn(['male', 'female', 'other'])
+      .withMessage('Gender must be male, female, or other'),
+    body('symptoms')
+      .isArray({ min: 1 })
+      .withMessage('At least one symptom is required'),
+    body('symptoms.*')
+      .trim()
+      .isLength({ min: 2, max: 50 })
+      .withMessage('Each symptom must be between 2 and 50 characters'),
+    body('severity')
+      .isIn(['low', 'medium', 'high', 'critical'])
+      .withMessage('Severity must be low, medium, high, or critical'),
+    body('village')
+      .trim()
+      .isLength({ min: 2, max: 100 })
+      .withMessage('Village name must be between 2 and 100 characters'),
+    body('location')
+      .optional()
+      .isObject()
+      .withMessage('Location must be a valid object'),
+    body('waterTestResults')
+      .optional()
+      .isObject()
+      .withMessage('Water test results must be a valid object'),
+    body('notes')
+      .optional()
+      .trim()
+      .isLength({ max: 1000 })
+      .withMessage('Notes must not exceed 1000 characters')
+  ])
+
+  static validateGetReports = validate([
+    query('page')
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage('Page must be a positive integer'),
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be between 1 and 100'),
+    query('status')
+      .optional()
+      .isIn(['pending', 'reviewed', 'flagged', 'resolved'])
+      .withMessage('Invalid status value'),
+    query('severity')
+      .optional()
+      .isIn(['low', 'medium', 'high', 'critical'])
+      .withMessage('Invalid severity value'),
+    query('dateFrom')
+      .optional()
+      .isISO8601()
+      .withMessage('Date from must be a valid ISO 8601 date'),
+    query('dateTo')
+      .optional()
+      .isISO8601()
+      .withMessage('Date to must be a valid ISO 8601 date'),
+    query('sortBy')
+      .optional()
+      .isIn(['submittedAt', 'severity', 'village', 'status'])
+      .withMessage('Invalid sort field'),
+    query('sortOrder')
+      .optional()
+      .isIn(['asc', 'desc'])
+      .withMessage('Sort order must be asc or desc')
+  ])
+
+  static validateReportId = validate([
+    param('id')
+      .isMongoId()
+      .withMessage('Invalid report ID format')
+  ])
+
+  static validateUpdateReport = validate([
+    param('id')
+      .isMongoId()
+      .withMessage('Invalid report ID format'),
+    body('status')
+      .optional()
+      .isIn(['pending', 'reviewed', 'flagged', 'resolved'])
+      .withMessage('Invalid status value'),
+    body('notes')
+      .optional()
+      .trim()
+      .isLength({ max: 1000 })
+      .withMessage('Notes must not exceed 1000 characters'),
+    body('priority')
+      .optional()
+      .isIn(['low', 'medium', 'high', 'critical'])
+      .withMessage('Invalid priority value')
+  ])
+
   // Create new report
   async createReport(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const reportData = {
-        ...req.body,
-        submittedBy: req.user?._id
+      // Validate user exists and is active
+      if (!req.user?._id) {
+        throw createError('User not authenticated', 401)
       }
 
-      const report = new Report(reportData)
-      await report.save()
+      const reportData = {
+        ...req.body,
+        submittedBy: req.user._id,
+        submittedAt: new Date()
+      }
 
-      // Populate submittedBy field
-      await report.populate('submittedBy', 'name email role village')
+      // Create report using service
+      const report = await reportService.createReport(reportData)
 
-      // Check for alert conditions
-      await this.checkAlertConditions(report)
+      // Check for alert conditions asynchronously (don't wait)
+      reportService.checkAlertConditions(report).catch(error => {
+        logger.error('Error checking alert conditions:', error)
+      })
 
-      logger.info(`New report created: ${report._id} by ${req.user?.email}`)
+      logger.info(`New report created: ${report._id} by ${req.user.email}`, {
+        reportId: report._id,
+        userId: req.user._id,
+        village: report.village,
+        severity: report.severity
+      })
 
       res.status(201).json({
         success: true,
-        data: { report }
+        data: { report },
+        message: 'Report created successfully'
       })
-    } catch (error) {
+    } catch (error: any) {
+      logger.error('Error creating report:', {
+        error: error.message,
+        userId: req.user?._id,
+        reportData: req.body
+      })
       next(error)
     }
   }
@@ -50,55 +168,49 @@ export class ReportController {
       } = req.query
 
       // Build filter object
-      const filter: any = {}
+      const filters: ReportFilters = {}
 
       // Role-based filtering
       if (req.user?.role === 'health_worker') {
-        filter.submittedBy = req.user._id
+        filters.submittedBy = req.user._id
       } else if (req.user?.role === 'supervisor' && req.user?.village) {
-        filter.village = req.user.village
+        filters.village = req.user.village
       }
 
       // Apply filters
-      if (status) filter.status = status
-      if (severity) filter.severity = severity
-      if (village) filter.village = new RegExp(village as string, 'i')
-      if (dateFrom || dateTo) {
-        filter.submittedAt = {}
-        if (dateFrom) filter.submittedAt.$gte = new Date(dateFrom as string)
-        if (dateTo) filter.submittedAt.$lte = new Date(dateTo as string)
+      if (status) filters.status = status as string
+      if (severity) filters.severity = severity as string
+      if (village) filters.village = village as string
+      if (dateFrom) filters.dateFrom = new Date(dateFrom as string)
+      if (dateTo) filters.dateTo = new Date(dateTo as string)
+
+      // Build pagination options
+      const pagination: PaginationOptions = {
+        page: Number(page),
+        limit: Math.min(Number(limit), 100), // Cap at 100
+        sortBy: sortBy as string,
+        sortOrder: sortOrder as 'asc' | 'desc'
       }
 
-      // Calculate pagination
-      const skip = (Number(page) - 1) * Number(limit)
+      // Get reports using service
+      const result = await reportService.getReports(filters, pagination)
 
-      // Build sort object
-      const sort: any = {}
-      sort[sortBy as string] = sortOrder === 'desc' ? -1 : 1
-
-      // Execute query
-      const reports = await Report.find(filter)
-        .populate('submittedBy', 'name email role village')
-        .populate('reviewedBy', 'name email role')
-        .sort(sort)
-        .skip(skip)
-        .limit(Number(limit))
-
-      const total = await Report.countDocuments(filter)
+      logger.info(`Reports fetched: ${result.reports.length} of ${result.total}`, {
+        userId: req.user?._id,
+        filters,
+        pagination: { page: pagination.page, limit: pagination.limit }
+      })
 
       res.json({
         success: true,
-        data: {
-          reports,
-          pagination: {
-            page: Number(page),
-            limit: Number(limit),
-            total,
-            pages: Math.ceil(total / Number(limit))
-          }
-        }
+        data: result
       })
-    } catch (error) {
+    } catch (error: any) {
+      logger.error('Error fetching reports:', {
+        error: error.message,
+        userId: req.user?._id,
+        query: req.query
+      })
       next(error)
     }
   }
