@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Smart Health Monitor",
   description: "Health monitoring system for tracking patient symptoms and disease outbreaks",
-  generator: "v0.app",
 }
 
 export default function RootLayout({

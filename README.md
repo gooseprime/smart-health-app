@@ -39,11 +39,11 @@ styles/         # additional styles (if any)
 ## Architecture (High-level)
 ```mermaid
 graph TD
-  A[User (Browser)] --> B[Next.js App]
+  A[User] --> B[Next.js App]
   B --> C[UI Components]
-  B --> D[State: Auth | I18n | Offline]
-  D -->|Sync| E[/API Routes/]
-  E --> F[Backend Services (ReportService)]
+  B --> D[State: Auth / I18n / Offline]
+  D -->|Sync| E[API Routes]
+  E --> F[Backend Services]
   F --> G[(Database)]
 ```
 
