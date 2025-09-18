@@ -6,9 +6,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  images: {
-    unoptimized: true,
-  },
   // Enable static export for Capacitor
   output: 'export',
   trailingSlash: true,
@@ -17,6 +14,12 @@ const nextConfig = {
   experimental: {
     esmExternals: false,
   },
+  // Add asset prefix for static export
+  assetPrefix: './',
+  // Disable image optimization
+  images: {
+    unoptimized: true,
+  }
 }
 
 export default nextConfig

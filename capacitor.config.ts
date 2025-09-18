@@ -4,10 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.smarthealth.monitor',
   appName: 'Smart Health Monitor',
   webDir: 'out',
-  server: {
-    url: 'http://localhost:3001',
-    cleartext: true
-  }
+  // Remove server config to use static files
 };
 
 export default config;

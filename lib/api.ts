@@ -62,90 +62,55 @@ export class ApiClient {
     return response.json()
   }
 
-  // Authentication endpoints
+  // Authentication endpoints - using mock API for static export
   async login(email: string, password: string): Promise<{ token: string; user: any }> {
-    // Mock authentication
-    if (email === 'admin@health.gov' && password === 'admin123') {
-      mockAuthToken = 'mock-jwt-token-' + Date.now()
-      return {
-        token: mockAuthToken,
-        user: {
-          id: '1',
-          email: 'admin@health.gov',
-          name: 'Health Administrator',
-          role: 'admin'
-        }
-      }
-    }
-    throw new Error('Invalid credentials')
+    return mockApi.login(email, password)
   }
 
   async logout(): Promise<void> {
-    mockAuthToken = null
-    await delay(200)
+    return mockApi.logout()
   }
 
   async getCurrentUser(): Promise<any> {
-    if (!mockAuthToken) {
-      throw new Error('Not authenticated')
-    }
-    return {
-      id: '1',
-      email: 'admin@health.gov',
-      name: 'Health Administrator',
-      role: 'admin'
-    }
+    return mockApi.getCurrentUser()
   }
 
-  // Reports endpoints
+  // Reports endpoints - using mock API for static export
   async getReports(): Promise<Report[]> {
-    return this.request<Report[]>('/reports')
+    return mockApi.getReports()
   }
 
   async getReport(id: string): Promise<Report> {
-    return this.request<Report>(`/reports/${id}`)
+    const reports = await mockApi.getReports()
+    const report = reports.find(r => r.id === id)
+    if (!report) throw new Error('Report not found')
+    return report
   }
 
   async createReport(report: Omit<Report, 'id' | 'submittedAt' | 'status'>): Promise<Report> {
-    const newReport: Report = {
-      ...report,
-      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-      submittedAt: new Date().toISOString(),
-      status: 'submitted'
-    }
-    
-    return this.request<Report>('/reports', {
-      method: 'POST',
-      body: JSON.stringify(newReport)
-    })
+    return mockApi.createReport(report)
   }
 
   async updateReport(id: string, updates: Partial<Report>): Promise<Report> {
-    return this.request<Report>(`/reports/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates)
-    })
+    return mockApi.updateReport(id, updates)
   }
 
   async deleteReport(id: string): Promise<void> {
-    return this.request<void>(`/reports/${id}`, {
-      method: 'DELETE'
-    })
+    return mockApi.deleteReport(id)
   }
 
   async exportReports(format: 'csv' | 'excel'): Promise<Blob> {
-    const response = await fetch(`${this.baseUrl}/reports/export?format=${format}`, {
-      headers: this.apiKey ? { 'Authorization': `Bearer ${this.apiKey}` } : {}
-    })
+    // Mock export functionality for static export
+    const reports = await mockApi.getReports()
+    const csvContent = reports.map(report => 
+      `${report.id},${report.patientName},${report.village},${report.symptoms.join(';')},${report.waterContamination}`
+    ).join('\n')
     
-    if (!response.ok) {
-      throw new Error(`Export failed: ${response.statusText}`)
-    }
-    
-    return response.blob()
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    return blob
   }
 
-  // Statistics endpoints
+  // Statistics endpoints - using mock API for static export
   async getStatistics(): Promise<{
     totalReports: number
     recentReports: number
@@ -153,7 +118,7 @@ export class ApiClient {
     highRiskReports: number
     waterQualityPercentage: number
   }> {
-    return this.request('/statistics')
+    return mockApi.getStatistics()
   }
 
   async getReportStats(): Promise<{
@@ -162,12 +127,37 @@ export class ApiClient {
     symptomFrequency: Record<string, number>
     waterQualityDistribution: Record<string, number>
   }> {
-    return this.request('/reports/stats')
+    // Mock implementation for report stats
+    const reports = await mockApi.getReports()
+    const reportsByVillage: Record<string, number> = {}
+    const reportsByDate: Array<{ date: string; count: number }> = []
+    const symptomFrequency: Record<string, number> = {}
+    const waterQualityDistribution: Record<string, number> = {}
+
+    reports.forEach(report => {
+      // Count by village
+      reportsByVillage[report.village] = (reportsByVillage[report.village] || 0) + 1
+      
+      // Count symptoms
+      report.symptoms.forEach(symptom => {
+        symptomFrequency[symptom] = (symptomFrequency[symptom] || 0) + 1
+      })
+      
+      // Count water quality
+      waterQualityDistribution[report.waterContamination] = (waterQualityDistribution[report.waterContamination] || 0) + 1
+    })
+
+    return {
+      reportsByVillage,
+      reportsByDate,
+      symptomFrequency,
+      waterQualityDistribution
+    }
   }
 
-  // Alert Rules endpoints
+  // Alert Rules endpoints - using mock API for static export
   async getAlertRules(): Promise<AlertRule[]> {
-    return this.request<AlertRule[]>('/alert-rules')
+    return mockApi.getAlertRules()
   }
 
   async createAlertRule(rule: Omit<AlertRule, 'id'>): Promise<AlertRule> {
@@ -175,62 +165,84 @@ export class ApiClient {
       ...rule,
       id: Date.now().toString(36) + Math.random().toString(36).substr(2)
     }
-    
-    return this.request<AlertRule>('/alert-rules', {
-      method: 'POST',
-      body: JSON.stringify(newRule)
-    })
+    const rules = await mockApi.getAlertRules()
+    rules.push(newRule)
+    await mockApi.saveAlertRules(rules)
+    return newRule
   }
 
   async updateAlertRule(id: string, updates: Partial<AlertRule>): Promise<AlertRule> {
-    return this.request<AlertRule>(`/alert-rules/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates)
-    })
+    const rules = await mockApi.getAlertRules()
+    const index = rules.findIndex(r => r.id === id)
+    if (index === -1) throw new Error('Alert rule not found')
+    rules[index] = { ...rules[index], ...updates }
+    await mockApi.saveAlertRules(rules)
+    return rules[index]
   }
 
   async deleteAlertRule(id: string): Promise<void> {
-    return this.request<void>(`/alert-rules/${id}`, {
-      method: 'DELETE'
-    })
+    const rules = await mockApi.getAlertRules()
+    const filteredRules = rules.filter(r => r.id !== id)
+    await mockApi.saveAlertRules(filteredRules)
   }
 
-  // Village Settings endpoints
+  // Village Settings endpoints - using mock API for static export
   async getVillageSettings(): Promise<VillageSettings[]> {
-    return this.request<VillageSettings[]>('/village-settings')
+    return mockApi.getVillageSettings()
   }
 
   async updateVillageSettings(settings: VillageSettings[]): Promise<VillageSettings[]> {
-    return this.request<VillageSettings[]>('/village-settings', {
-      method: 'PUT',
-      body: JSON.stringify(settings)
-    })
+    await mockApi.saveVillageSettings(settings)
+    return settings
   }
 
   async getVillageSetting(villageName: string): Promise<VillageSettings> {
-    return this.request<VillageSettings>(`/village-settings/${encodeURIComponent(villageName)}`)
+    const settings = await mockApi.getVillageSettings()
+    const setting = settings.find(s => s.name === villageName)
+    if (!setting) throw new Error('Village setting not found')
+    return setting
   }
 
-  // Alerts endpoints
+  // Alerts endpoints - using mock API for static export
   async getAlerts(): Promise<any[]> {
-    return this.request('/alerts')
+    // Mock alerts based on reports
+    const reports = await mockApi.getReports()
+    const alerts = []
+    
+    // Generate alerts based on high-risk reports
+    const highRiskReports = reports.filter(r => r.waterContamination === 'high')
+    highRiskReports.forEach(report => {
+      alerts.push({
+        id: `alert-${report.id}`,
+        type: 'water_contamination',
+        severity: 'high',
+        message: `High water contamination detected in ${report.village}`,
+        reportId: report.id,
+        timestamp: report.submittedAt,
+        acknowledged: false,
+        resolved: false
+      })
+    })
+    
+    return alerts
   }
 
   async acknowledgeAlert(alertId: string): Promise<void> {
-    return this.request(`/alerts/${alertId}/acknowledge`, {
-      method: 'POST'
-    })
+    // Mock acknowledgment - in a real app, this would update the alert status
+    await delay(200)
   }
 
   async resolveAlert(alertId: string): Promise<void> {
-    return this.request(`/alerts/${alertId}/resolve`, {
-      method: 'POST'
-    })
+    // Mock resolution - in a real app, this would update the alert status
+    await delay(200)
   }
 
-  // Health check endpoint
+  // Health check endpoint - using mock API for static export
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
-    return this.request('/health')
+    return {
+      status: 'healthy',
+      timestamp: new Date().toISOString()
+    }
   }
 }
 
@@ -428,6 +440,9 @@ export const initializeMockData = () => {
     }
   ]
 }
+
+// Initialize mock data
+initializeMockData()
 
 // Create a default API client instance
 export const apiClient = new ApiClient()
