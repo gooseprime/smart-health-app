@@ -22,7 +22,7 @@ import { notFound } from './middleware/notFound'
 import { logger } from './utils/logger'
 
 // Import database connection
-import { connectDatabase } from './config/database'
+import { connectDatabase } from '../config/database'
 
 // Load environment variables
 dotenv.config()

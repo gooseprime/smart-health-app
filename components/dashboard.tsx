@@ -46,6 +46,7 @@ import {
 } from "lucide-react"
 import { MapVisualization } from "./map-visualization"
 import { dataLayer } from "@/lib/data-layer"
+import { apiClient } from "@/lib/api"
 
 interface Report {
   id: string
@@ -111,68 +112,25 @@ export function Dashboard() {
     }
   }
 
-  // Generate mock data for demonstration
-  const generateMockData = () => {
-    const mockReports: Report[] = [
-      {
-        id: "1",
-        patientName: "John Doe",
-        age: "35",
-        village: "Riverside Village",
-        symptoms: ["Diarrhea", "Fever", "Nausea"],
-        waterTurbidity: "15.2",
-        waterPH: "6.8",
-        waterContamination: "medium",
-        notes: "Patient reports symptoms started 3 days ago",
-        submittedBy: "Health Worker",
-        submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        status: "submitted",
-      },
-      {
-        id: "2",
-        patientName: "Jane Smith",
-        age: "28",
-        village: "Mountain View",
-        symptoms: ["Vomiting", "Abdominal Pain"],
-        waterTurbidity: "22.1",
-        waterPH: "7.2",
-        waterContamination: "high",
-        notes: "Severe symptoms, referred to clinic",
-        submittedBy: "Health Worker",
-        submittedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        status: "submitted",
-      },
-      {
-        id: "3",
-        patientName: "Bob Johnson",
-        age: "42",
-        village: "Green Valley",
-        symptoms: ["Jaundice", "Fatigue"],
-        waterTurbidity: "8.5",
-        waterPH: "7.8",
-        waterContamination: "low",
-        notes: "Mild symptoms, monitoring",
-        submittedBy: "Health Worker",
-        submittedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        status: "submitted",
-      },
-    ]
-
-    const allReports = [...reports, ...mockReports]
-    setReports(allReports)
-    
-    // Save using data layer
+  // Load data from API
+  const loadDataFromAPI = async () => {
     try {
-      // In a real app, this would save to backend
-      localStorage.setItem("health-reports", JSON.stringify(allReports))
+      setIsLoading(true)
+      const response = await apiClient.getReports()
+      setReports(response.reports || [])
     } catch (error) {
-      console.error('Failed to save reports:', error)
+      console.error('Error loading reports from API:', error)
+      // Fallback to local data if API fails
+      const localReports = await dataLayer.getReports()
+      setReports(localReports)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   useEffect(() => {
     if (reports.length === 0) {
-      generateMockData()
+      loadDataFromAPI()
     }
   }, [])
 
@@ -365,9 +323,9 @@ export function Dashboard() {
               <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button onClick={generateMockData} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+            <Button onClick={loadDataFromAPI} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
               <Activity className="w-4 h-4 mr-2" />
-              Sample Data
+              Load Data
             </Button>
             <Button onClick={() => exportReports('csv')} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
               <Download className="w-4 h-4 mr-2" />
