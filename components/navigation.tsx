@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
-import { Menu, Heart, FileText, BarChart3, AlertTriangle, LogOut, User } from "lucide-react"
+import { Menu, Heart, FileText, BarChart3, AlertTriangle, LogOut, User, Settings } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useI18n } from "@/lib/i18n"
 import { LanguageSwitcher } from "@/components/language-switcher"
@@ -15,6 +15,14 @@ interface NavigationProps {
   onLogout?: () => void
 }
 
+interface MenuItem {
+  id: string
+  label: string
+  icon: any
+  adminOnly?: boolean
+  healthWorkerOnly?: boolean
+}
+
 export function Navigation({ currentPage, onPageChange, onLogout }: NavigationProps) {
   const { user, logout } = useAuth()
   const { t } = useI18n()
@@ -22,13 +30,18 @@ export function Navigation({ currentPage, onPageChange, onLogout }: NavigationPr
 
   const handleLogout = onLogout || logout
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { id: "dashboard", label: t("nav.dashboard"), icon: BarChart3, adminOnly: true },
-    { id: "report", label: t("nav.submit_report"), icon: FileText, adminOnly: false },
+    { id: "report", label: t("nav.submit_report"), icon: FileText, healthWorkerOnly: true },
     { id: "alerts", label: t("nav.alerts"), icon: AlertTriangle, adminOnly: true },
+    { id: "admin-settings", label: "Admin Settings", icon: Settings, adminOnly: true },
   ]
 
-  const visibleItems = menuItems.filter((item) => !item.adminOnly || user?.role === "admin")
+  const visibleItems = menuItems.filter((item) => {
+    if (item.adminOnly) return user?.role === "admin"
+    if (item.healthWorkerOnly) return user?.role === "health_worker"
+    return true
+  })
 
   const handlePageChange = (page: string) => {
     onPageChange(page)

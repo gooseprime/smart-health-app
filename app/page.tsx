@@ -8,6 +8,7 @@ import { Navigation } from "@/components/navigation"
 import { ReportForm } from "@/components/report-form"
 import { Dashboard } from "@/components/dashboard"
 import { AlertsPanel } from "@/components/alerts-panel"
+import { AdminSettings } from "@/components/admin-settings"
 import { OfflineIndicator } from "@/components/offline-indicator"
 import { Skeleton } from "@/components/ui/skeleton"
 // import { createClient } from "@/lib/supabase/client"
@@ -15,7 +16,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function AppContent() {
   const { user, isLoading, logout } = useAuth()
-  const [currentPage, setCurrentPage] = useState(() => (user?.role === "admin" ? "dashboard" : "report"))
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (user?.role === "admin") return "dashboard"
+    if (user?.role === "health_worker") return "report"
+    return "dashboard" // fallback
+  })
 
   const handleLogout = () => {
     logout()
@@ -42,9 +47,11 @@ function AppContent() {
       case "dashboard":
         return user.role === "admin" ? <Dashboard /> : <ReportForm />
       case "report":
-        return <ReportForm />
+        return user.role === "health_worker" ? <ReportForm /> : <Dashboard />
       case "alerts":
         return user.role === "admin" ? <AlertsPanel /> : <ReportForm />
+      case "admin-settings":
+        return user.role === "admin" ? <AdminSettings /> : <ReportForm />
       default:
         return user.role === "admin" ? <Dashboard /> : <ReportForm />
     }

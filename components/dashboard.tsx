@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Separator } from "@/components/ui/separator"
 import {
   BarChart,
   Bar,
@@ -19,8 +21,31 @@ import {
   Cell,
   LineChart,
   Line,
+  Area,
+  AreaChart,
 } from "recharts"
-import { MapPin, Droplets, AlertTriangle, Activity, FileText } from "lucide-react"
+import { 
+  MapPin, 
+  Droplets, 
+  AlertTriangle, 
+  Activity, 
+  FileText, 
+  Download, 
+  TrendingUp, 
+  TrendingDown,
+  Users,
+  Shield,
+  Clock,
+  RefreshCw,
+  Eye,
+  Filter,
+  Calendar,
+  BarChart3,
+  PieChart as PieChartIcon,
+  LineChart as LineChartIcon
+} from "lucide-react"
+import { MapVisualization } from "./map-visualization"
+import { dataLayer } from "@/lib/data-layer"
 
 interface Report {
   id: string
@@ -52,12 +77,39 @@ const villageCoordinates: Record<string, { lat: number; lng: number }> = {
 export function Dashboard() {
   const [reports, setReports] = useState<Report[]>([])
   const [selectedTimeframe, setSelectedTimeframe] = useState("7days")
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
-    // Load reports from localStorage
-    const storedReports = JSON.parse(localStorage.getItem("health-reports") || "[]")
-    setReports(storedReports)
+    // Load reports using data layer
+    const loadReports = async () => {
+      setIsLoading(true)
+      try {
+        const reports = await dataLayer.getReports()
+        setReports(reports)
+      } catch (error) {
+        console.error('Failed to load reports:', error)
+        // Fallback to localStorage if data layer fails
+        const storedReports = JSON.parse(localStorage.getItem("health-reports") || "[]")
+        setReports(storedReports)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadReports()
   }, [])
+
+  const refreshData = async () => {
+    setIsRefreshing(true)
+    try {
+      const reports = await dataLayer.getReports()
+      setReports(reports)
+    } catch (error) {
+      console.error('Failed to refresh reports:', error)
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
 
   // Generate mock data for demonstration
   const generateMockData = () => {
@@ -108,7 +160,14 @@ export function Dashboard() {
 
     const allReports = [...reports, ...mockReports]
     setReports(allReports)
-    localStorage.setItem("health-reports", JSON.stringify(allReports))
+    
+    // Save using data layer
+    try {
+      // In a real app, this would save to backend
+      localStorage.setItem("health-reports", JSON.stringify(allReports))
+    } catch (error) {
+      console.error('Failed to save reports:', error)
+    }
   }
 
   useEffect(() => {
@@ -116,6 +175,75 @@ export function Dashboard() {
       generateMockData()
     }
   }, [])
+
+  // Export functionality
+  const exportReports = (format: 'csv' | 'excel') => {
+    if (reports.length === 0) {
+      alert('No reports to export')
+      return
+    }
+
+    const headers = [
+      'ID', 'Patient Name', 'Age', 'Village', 'Symptoms', 
+      'Water Turbidity', 'Water pH', 'Water Contamination', 
+      'Notes', 'Submitted By', 'Submitted At', 'Status'
+    ]
+
+    const csvData = reports.map(report => [
+      report.id,
+      report.patientName,
+      report.age,
+      report.village,
+      report.symptoms.join('; '),
+      report.waterTurbidity,
+      report.waterPH,
+      report.waterContamination,
+      report.notes,
+      report.submittedBy,
+      new Date(report.submittedAt).toLocaleDateString(),
+      report.status
+    ])
+
+    if (format === 'csv') {
+      const csvContent = [headers, ...csvData]
+        .map(row => row.map(field => `"${field}"`).join(','))
+        .join('\n')
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `health-reports-${new Date().toISOString().split('T')[0]}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } else if (format === 'excel') {
+      // For Excel export, we'll create a more structured format
+      const excelData = [
+        ['Health Reports Export'],
+        [`Generated on: ${new Date().toLocaleDateString()}`],
+        [`Total Reports: ${reports.length}`],
+        [''],
+        headers,
+        ...csvData
+      ]
+
+      const csvContent = excelData
+        .map(row => row.map(field => `"${field}"`).join(','))
+        .join('\n')
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `health-reports-${new Date().toISOString().split('T')[0]}.xlsx`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
 
   // Calculate statistics
   const totalReports = reports.length
@@ -172,112 +300,321 @@ export function Dashboard() {
     }
   })
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-primary">Health Dashboard</h1>
-          <p className="text-muted-foreground">Monitor community health trends and water quality</p>
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-24" />
+            <Skeleton className="h-10 w-24" />
+          </div>
         </div>
-        <Button onClick={generateMockData} variant="outline">
-          <Activity className="w-4 h-4 mr-2" />
-          Generate Sample Data
-        </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="p-6">
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Enhanced Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 p-8 text-white">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                <BarChart3 className="w-6 h-6" />
+              </div>
+              <h1 className="text-3xl font-bold">Health Dashboard</h1>
+            </div>
+            <p className="text-blue-100 text-lg">Monitor community health trends and water quality in real-time</p>
+            <div className="flex items-center gap-4 text-sm text-blue-200">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                Last updated: {new Date().toLocaleTimeString()}
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                {uniqueVillages} villages monitored
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button 
+              onClick={refreshData} 
+              variant="secondary" 
+              size="sm"
+              disabled={isRefreshing}
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Button onClick={generateMockData} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+              <Activity className="w-4 h-4 mr-2" />
+              Sample Data
+            </Button>
+            <Button onClick={() => exportReports('csv')} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+              <Download className="w-4 h-4 mr-2" />
+              CSV
+            </Button>
+            <Button onClick={() => exportReports('excel')} variant="secondary" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/20">
+              <Download className="w-4 h-4 mr-2" />
+              Excel
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* Key Metrics */}
+      {/* Enhanced Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="transition-all duration-200 hover:shadow-lg hover:scale-[1.02]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+        {/* Total Reports Card */}
+        <Card className="group relative overflow-hidden border border-blue-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-blue-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <CardTitle className="text-sm font-semibold text-blue-700">Total Reports</CardTitle>
+            <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+              <FileText className="h-5 w-5 text-blue-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{totalReports}</div>
-            <p className="text-xs text-muted-foreground">+{recentReports.length} this week</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold text-blue-900 mb-1">{totalReports}</div>
+            <div className="flex items-center gap-1 text-sm">
+              <TrendingUp className="h-3 w-3 text-green-600" />
+              <span className="text-green-600 font-medium">+{recentReports.length}</span>
+              <span className="text-gray-500">this week</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="transition-all duration-200 hover:shadow-lg hover:scale-[1.02]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Villages Monitored</CardTitle>
-            <MapPin className="h-4 w-4 text-muted-foreground" />
+        {/* Villages Monitored Card */}
+        <Card className="group relative overflow-hidden border border-green-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-green-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-green-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <CardTitle className="text-sm font-semibold text-green-700">Villages Monitored</CardTitle>
+            <div className="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+              <MapPin className="h-5 w-5 text-green-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{uniqueVillages}</div>
-            <p className="text-xs text-muted-foreground">Active monitoring locations</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold text-green-900 mb-1">{uniqueVillages}</div>
+            <div className="flex items-center gap-1 text-sm">
+              <Shield className="h-3 w-3 text-green-600" />
+              <span className="text-green-600 font-medium">Active</span>
+              <span className="text-gray-500">monitoring</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="transition-all duration-200 hover:shadow-lg hover:scale-[1.02]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">High Risk Areas</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
+        {/* High Risk Areas Card */}
+        <Card className="group relative overflow-hidden border border-red-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-red-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-red-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <CardTitle className="text-sm font-semibold text-red-700">High Risk Areas</CardTitle>
+            <div className="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{highRiskReports}</div>
-            <p className="text-xs text-muted-foreground">Require immediate attention</p>
+          <CardContent className="relative">
+            <div className="text-3xl font-bold text-red-900 mb-1">{highRiskReports}</div>
+            <div className="flex items-center gap-1 text-sm">
+              <AlertTriangle className="h-3 w-3 text-red-600" />
+              <span className="text-red-600 font-medium">Critical</span>
+              <span className="text-gray-500">attention needed</span>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="transition-all duration-200 hover:shadow-lg hover:scale-[1.02]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Water Quality</CardTitle>
-            <Droplets className="h-4 w-4 text-blue-500" />
+        {/* Water Quality Card */}
+        <Card className="group relative overflow-hidden border border-cyan-200 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-cyan-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-50 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
+            <CardTitle className="text-sm font-semibold text-cyan-700">Water Quality</CardTitle>
+            <div className="p-2 bg-cyan-100 rounded-lg group-hover:bg-cyan-200 transition-colors">
+              <Droplets className="h-5 w-5 text-cyan-600" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+          <CardContent className="relative">
+            <div className="text-3xl font-bold text-cyan-900 mb-1">
               {reports.length > 0
                 ? Math.round((reports.filter((r) => r.waterContamination !== "high").length / reports.length) * 100)
-                : 0}
-              %
+                : 0}%
             </div>
-            <p className="text-xs text-muted-foreground">Safe water sources</p>
+            <div className="flex items-center gap-1 text-sm">
+              <Droplets className="h-3 w-3 text-cyan-600" />
+              <span className="text-cyan-600 font-medium">Safe</span>
+              <span className="text-gray-500">water sources</span>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
-          <TabsTrigger value="water">Water Quality</TabsTrigger>
-          <TabsTrigger value="reports">Recent Reports</TabsTrigger>
-        </TabsList>
+      {/* Enhanced Tabs Section */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">Analytics & Reports</h2>
+            <p className="text-muted-foreground">Comprehensive health data visualization and insights</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Filter className="w-4 h-4 mr-2" />
+              Filter
+            </Button>
+            <Button variant="outline" size="sm">
+              <Calendar className="w-4 h-4 mr-2" />
+              Date Range
+            </Button>
+          </div>
+        </div>
 
-        <TabsContent value="overview" className="space-y-4">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 rounded-xl">
+            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <BarChart3 className="w-4 h-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="map" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <MapPin className="w-4 h-4" />
+              Map View
+            </TabsTrigger>
+            <TabsTrigger value="symptoms" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Activity className="w-4 h-4" />
+              Symptoms
+            </TabsTrigger>
+            <TabsTrigger value="water" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <Droplets className="w-4 h-4" />
+              Water Quality
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              <FileText className="w-4 h-4" />
+              Recent Reports
+            </TabsTrigger>
+          </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Report Timeline</CardTitle>
-                <CardDescription>Daily report submissions over the last week</CardDescription>
+            {/* Enhanced Timeline Chart */}
+            <Card className="border border-gray-200 shadow-lg bg-white">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <LineChartIcon className="w-5 h-5 text-blue-600" />
+                      Report Timeline
+                    </CardTitle>
+                    <CardDescription>Daily report submissions over the last week</CardDescription>
+                  </div>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                    <TrendingUp className="w-3 h-3 mr-1" />
+                    +12%
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={timelineData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="reports" stroke="#164e63" strokeWidth={2} />
-                  </LineChart>
+                <ResponsiveContainer width="100%" height={320}>
+                  <AreaChart data={timelineData}>
+                    <defs>
+                      <linearGradient id="colorReports" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis 
+                      dataKey="date" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="reports" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3}
+                      fill="url(#colorReports)"
+                    />
+                  </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Village Report Distribution</CardTitle>
-                <CardDescription>Number of reports by village</CardDescription>
+            {/* Enhanced Village Distribution Chart */}
+            <Card className="border border-gray-200 shadow-lg bg-white">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <BarChart3 className="w-5 h-5 text-green-600" />
+                      Village Distribution
+                    </CardTitle>
+                    <CardDescription>Number of reports by village</CardDescription>
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    <MapPin className="w-3 h-3 mr-1" />
+                    {uniqueVillages} villages
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={villageData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="village" angle={-45} textAnchor="end" height={80} />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#164e63" />
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart data={villageData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis 
+                      dataKey="village" 
+                      angle={-45} 
+                      textAnchor="end" 
+                      height={80}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 11, fill: '#64748b' }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      fill="#10b981"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -285,42 +622,102 @@ export function Dashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="symptoms" className="space-y-4">
+        <TabsContent value="map" className="space-y-4">
+          <MapVisualization />
+        </TabsContent>
+
+        <TabsContent value="symptoms" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Most Common Symptoms</CardTitle>
-                <CardDescription>Frequency of reported symptoms</CardDescription>
+            {/* Enhanced Symptoms Chart */}
+            <Card className="border border-gray-200 shadow-lg bg-white">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Activity className="w-5 h-5 text-orange-600" />
+                      Most Common Symptoms
+                    </CardTitle>
+                    <CardDescription>Frequency of reported symptoms</CardDescription>
+                  </div>
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                    <Activity className="w-3 h-3 mr-1" />
+                    {symptomData.length} symptoms
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={symptomData} layout="horizontal">
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="symptom" type="category" width={100} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#f97316" />
+                  <BarChart data={symptomData} layout="horizontal" margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis 
+                      type="number" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <YAxis 
+                      dataKey="symptom" 
+                      type="category" 
+                      width={120}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      fill="#f97316"
+                      radius={[0, 4, 4, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Symptom Severity Indicators</CardTitle>
-                <CardDescription>Track concerning symptom patterns</CardDescription>
+            {/* Enhanced Severity Indicators */}
+            <Card className="border border-gray-200 shadow-lg bg-white">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                      Severity Indicators
+                    </CardTitle>
+                    <CardDescription>Track concerning symptom patterns</CardDescription>
+                  </div>
+                  <Badge variant="secondary" className="bg-red-100 text-red-700">
+                    <TrendingUp className="w-3 h-3 mr-1" />
+                    Monitoring
+                  </Badge>
+                </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 {symptomData.slice(0, 5).map((item, index) => (
-                  <div key={item.symptom} className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium">{item.symptom}</span>
-                      <span className="text-sm text-muted-foreground">{item.count} cases</span>
+                  <div key={item.symptom} className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-semibold text-foreground">{item.symptom}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-orange-600">{item.count}</span>
+                        <span className="text-xs text-muted-foreground">cases</span>
+                      </div>
                     </div>
-                    <Progress
-                      value={(item.count / Math.max(...symptomData.map((d) => d.count))) * 100}
-                      className="h-2"
-                    />
+                    <div className="space-y-1">
+                      <Progress
+                        value={(item.count / Math.max(...symptomData.map((d) => d.count))) * 100}
+                        className="h-3 bg-gray-200"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>0</span>
+                        <span>{Math.max(...symptomData.map((d) => d.count))}</span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </CardContent>
@@ -328,23 +725,35 @@ export function Dashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="water" className="space-y-4">
+        <TabsContent value="water" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Water Contamination Levels</CardTitle>
-                <CardDescription>Distribution of water quality assessments</CardDescription>
+            {/* Enhanced Water Quality Pie Chart */}
+            <Card className="border border-gray-200 shadow-lg bg-white">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <PieChartIcon className="w-5 h-5 text-cyan-600" />
+                      Water Contamination Levels
+                    </CardTitle>
+                    <CardDescription>Distribution of water quality assessments</CardDescription>
+                  </div>
+                  <Badge variant="secondary" className="bg-cyan-100 text-cyan-700">
+                    <Droplets className="w-3 h-3 mr-1" />
+                    Quality Check
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={320}>
                   <PieChart>
                     <Pie
                       data={waterQualityData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
+                      label={(props: any) => `${props.name} ${(props.percent * 100).toFixed(0)}%`}
+                      outerRadius={100}
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -352,16 +761,35 @@ export function Dashboard() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Water Quality Alerts</CardTitle>
-                <CardDescription>Areas requiring immediate attention</CardDescription>
+            {/* Enhanced Water Quality Alerts */}
+            <Card className="border border-gray-200 shadow-lg bg-white">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                      Water Quality Alerts
+                    </CardTitle>
+                    <CardDescription>Areas requiring immediate attention</CardDescription>
+                  </div>
+                  <Badge variant="destructive" className="bg-red-100 text-red-700">
+                    <AlertTriangle className="w-3 h-3 mr-1" />
+                    {reports.filter((report) => report.waterContamination === "high").length} alerts
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 {reports
@@ -370,30 +798,63 @@ export function Dashboard() {
                   .map((report) => (
                     <div
                       key={report.id}
-                      className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200"
+                      className="group flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border border-red-200 hover:shadow-md transition-all duration-200"
                     >
-                      <div>
-                        <p className="font-medium text-red-800">{report.village}</p>
-                        <p className="text-sm text-red-600">
-                          pH: {report.waterPH}, Turbidity: {report.waterTurbidity}
-                        </p>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-red-600" />
+                          <p className="font-semibold text-red-900">{report.village}</p>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-red-700">
+                          <span className="flex items-center gap-1">
+                            <span className="font-medium">pH:</span> {report.waterPH}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <span className="font-medium">Turbidity:</span> {report.waterTurbidity}
+                          </span>
+                        </div>
                       </div>
-                      <Badge variant="destructive">High Risk</Badge>
+                      <Badge variant="destructive" className="group-hover:scale-105 transition-transform">
+                        High Risk
+                      </Badge>
                     </div>
                   ))}
                 {reports.filter((report) => report.waterContamination === "high").length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">No high-risk water quality alerts</p>
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Shield className="w-8 h-8 text-green-600" />
+                    </div>
+                    <p className="text-lg font-medium text-green-700">All Clear!</p>
+                    <p className="text-sm text-gray-500">No high-risk water quality alerts</p>
+                  </div>
                 )}
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
-        <TabsContent value="reports" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Health Reports</CardTitle>
-              <CardDescription>Latest submissions from health workers</CardDescription>
+        <TabsContent value="reports" className="space-y-6">
+          <Card className="border border-gray-200 shadow-lg bg-white">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <FileText className="w-5 h-5 text-gray-600" />
+                    Recent Health Reports
+                  </CardTitle>
+                  <CardDescription>Latest submissions from health workers</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-gray-100 text-gray-700">
+                    <FileText className="w-3 h-3 mr-1" />
+                    {reports.length} total
+                  </Badge>
+                  <Button variant="outline" size="sm">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View All
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -403,45 +864,72 @@ export function Dashboard() {
                   .map((report) => (
                     <div
                       key={report.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      className="group flex items-center justify-between p-5 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-200 transition-all duration-200 hover:shadow-md"
                     >
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <p className="font-medium">{report.patientName}</p>
-                          <Badge variant="outline">{report.village}</Badge>
-                          <Badge
-                            variant={
-                              report.waterContamination === "high"
-                                ? "destructive"
-                                : report.waterContamination === "medium"
-                                  ? "secondary"
-                                  : "default"
-                            }
-                          >
-                            {report.waterContamination} risk
-                          </Badge>
+                      <div className="space-y-2 flex-1">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            {report.patientName.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-foreground">{report.patientName}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">
+                                <MapPin className="w-3 h-3 mr-1" />
+                                {report.village}
+                              </Badge>
+                              <Badge
+                                variant={
+                                  report.waterContamination === "high"
+                                    ? "destructive"
+                                    : report.waterContamination === "medium"
+                                      ? "secondary"
+                                      : "default"
+                                }
+                                className="text-xs"
+                              >
+                                {report.waterContamination} risk
+                              </Badge>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          Age: {report.age} | Symptoms: {report.symptoms.join(", ")}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Submitted by {report.submittedBy} on {new Date(report.submittedAt).toLocaleDateString()}
-                        </p>
+                        <div className="ml-13 space-y-1">
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium">Age:</span> {report.age} | 
+                            <span className="font-medium ml-1">Symptoms:</span> {report.symptoms.join(", ")}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium">Submitted by</span> {report.submittedBy} on {new Date(report.submittedAt).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">pH: {report.waterPH}</p>
-                        <p className="text-xs text-muted-foreground">Turbidity: {report.waterTurbidity}</p>
+                      <div className="text-right space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Droplets className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-semibold">pH: {report.waterPH}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-orange-500" />
+                          <span className="text-xs text-muted-foreground">Turbidity: {report.waterTurbidity}</span>
+                        </div>
                       </div>
                     </div>
                   ))}
                 {reports.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">No reports submitted yet</p>
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FileText className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-lg font-medium text-gray-600">No Reports Yet</p>
+                    <p className="text-sm text-gray-500">Health reports will appear here once submitted</p>
+                  </div>
                 )}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </div>
     </div>
   )
 }

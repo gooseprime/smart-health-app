@@ -9,6 +9,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Enable static export for Capacitor
+  output: 'export',
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
+  // Disable server-side features for static export
+  experimental: {
+    esmExternals: false,
+  },
 }
 
 export default nextConfig
