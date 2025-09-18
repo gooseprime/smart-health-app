@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AlertTriangle, Bell, CheckCircle, Clock, MapPin, TrendingUp, Users, Zap, Search, Filter, Download, RefreshCw, Eye, EyeOff, Calendar, BarChart3, Activity, AlertCircle } from "lucide-react"
+import { AlertTriangle, Bell, CheckCircle, Clock, MapPin, TrendingUp, Users, Zap, Search, Filter, Download, RefreshCw, Eye, EyeOff, Calendar, BarChart3, Activity, AlertCircle, Droplets } from "lucide-react"
 import { apiClient } from "@/lib/api"
+import { useWebSocket } from "@/lib/websocket"
+import { alertGenerator, type HealthReport, type GeneratedAlert } from "@/lib/alert-generator"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts"
 
 interface AlertRule {
@@ -74,9 +76,9 @@ const defaultAlertRules: AlertRule[] = [
 ]
 
 export function AlertsPanel() {
-  const [alerts, setAlerts] = useState<HealthAlert[]>([])
-  const [alertRules, setAlertRules] = useState<AlertRule[]>(defaultAlertRules)
-  const [reports, setReports] = useState<any[]>([])
+  const [alerts, setAlerts] = useState<GeneratedAlert[]>([])
+  const [alertRules, setAlertRules] = useState<AlertRule[]>([])
+  const [reports, setReports] = useState<HealthReport[]>([])
   const [analyticsData, setAnalyticsData] = useState<any>({})
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
@@ -85,50 +87,117 @@ export function AlertsPanel() {
   const [dateRange, setDateRange] = useState<string>("7")
   const [showAnalytics, setShowAnalytics] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(true)
+  
+  // WebSocket integration
+  const { connect, disconnect, on, off, joinAdminRoom, isConnected } = useWebSocket()
 
   useEffect(() => {
     loadData()
     
-    // Auto-refresh every 30 seconds if enabled
+    // Initialize WebSocket connection
+    const initWebSocket = async () => {
+      try {
+        await connect()
+        if (isConnected()) {
+          joinAdminRoom()
+          
+          // Set up real-time event listeners
+          on('new-alert', (newAlert) => {
+            console.log('New alert received via WebSocket:', newAlert)
+            setAlerts(prev => [newAlert, ...prev])
+            // Show notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('New Health Alert', {
+                body: newAlert.title,
+                icon: '/android-chrome-192x192.png'
+              })
+            }
+          })
+          
+          on('alert-updated', (updatedAlert) => {
+            console.log('Alert updated via WebSocket:', updatedAlert)
+            setAlerts(prev => prev.map(alert => 
+              alert.id === updatedAlert.id ? updatedAlert : alert
+            ))
+          })
+          
+          on('report-updated', (updatedReport) => {
+            console.log('Report updated via WebSocket:', updatedReport)
+            setReports(prev => prev.map(report => 
+              report.id === updatedReport.id ? updatedReport : report
+            ))
+            // Re-run AI pattern detection
+            runAIPatternDetection([updatedReport])
+          })
+        } else {
+          console.log('WebSocket connection failed, using polling mode')
+        }
+      } catch (error) {
+        console.warn('WebSocket initialization failed, using polling mode:', error)
+      }
+    }
+    
+    initWebSocket()
+    
+    // Auto-refresh every 30 seconds if enabled and WebSocket is not connected
     const interval = setInterval(() => {
       if (autoRefresh) {
+        // If WebSocket is connected, refresh less frequently
+        // If WebSocket is not connected, refresh more frequently
+        const refreshInterval = isConnected() ? 60000 : 30000 // 1 min vs 30 sec
         loadData()
       }
     }, 30000)
 
-    return () => clearInterval(interval)
-  }, [autoRefresh])
+    return () => {
+      clearInterval(interval)
+      off('new-alert')
+      off('alert-updated')
+      off('report-updated')
+    }
+  }, [autoRefresh, connect, joinAdminRoom, on, off, isConnected])
 
   const loadData = async () => {
     setIsLoading(true)
     try {
-      const [reportsData, alertsData, rulesData, statsData] = await Promise.all([
-        apiClient.getReports(),
-        apiClient.getAlerts({
-          page: 1,
-          limit: 100,
-          acknowledged: false,
-          resolved: false
-        }),
+      // Try to get data from backend first
+      const [reportsData, rulesData, statsData] = await Promise.all([
+        apiClient.getReports({ page: 1, limit: 100 }),
         apiClient.getAlertRules(),
         apiClient.getAlertStats()
       ])
       
-      setReports(reportsData.reports || reportsData)
-      setAlerts(alertsData.alerts || alertsData)
-      setAlertRules(rulesData || [])
-      setAnalyticsData(statsData || {})
+      // Handle different response formats
+      const reports = (reportsData as any).data?.reports || (reportsData as any).reports || reportsData
+      const rules = (rulesData as any).data || rulesData || []
+      const stats = (statsData as any).data || statsData || {}
       
-      // Run AI/ML pattern detection
-      await runAIPatternDetection(reportsData.reports || reportsData)
+      setReports(reports)
+      setAlertRules(rules)
+      setAnalyticsData(stats)
+      
+      // Generate alerts from health reports
+      const generatedAlerts = await alertGenerator.generateAlertsFromReports(reports)
+      setAlerts(generatedAlerts)
+      
+      console.log("Data loaded successfully:", {
+        reports: reports.length,
+        generatedAlerts: generatedAlerts.length,
+        rules: rules.length
+      })
       
     } catch (error) {
       console.error("Error loading data:", error)
       // Fallback to localStorage
       const storedReports = JSON.parse(localStorage.getItem("health-reports") || "[]")
       setReports(storedReports)
-      generateAlerts(storedReports)
-      setAlertRules(defaultAlertRules)
+      
+      // Generate alerts from stored reports
+      const generatedAlerts = await alertGenerator.generateAlertsFromReports(storedReports)
+      setAlerts(generatedAlerts)
+      
+      // Use default alert rules
+      setAlertRules(alertGenerator.getAlertRules())
       setAnalyticsData(generateMockAnalytics())
     }
     setIsLoading(false)
@@ -250,14 +319,17 @@ export function AlertsPanel() {
         }
       })
 
-      // Add AI predictions to alerts
-      if (aiPredictions.length > 0) {
-        setAlerts(prev => {
-          const existingIds = new Set(prev.map(alert => alert.id))
-          const newPredictions = aiPredictions.filter(pred => !existingIds.has(pred.id))
-          return [...newPredictions, ...prev]
-        })
-      }
+      // Generate alerts from reports using the alert generator
+      const generatedAlerts = await alertGenerator.generateAlertsFromReports(reports)
+      
+      // Add new alerts to existing ones (avoid duplicates)
+      setAlerts(prev => {
+        const existingIds = new Set(prev.map(alert => alert.id))
+        const newAlerts = generatedAlerts.filter(alert => !existingIds.has(alert.id))
+        return [...newAlerts, ...prev]
+      })
+      
+      console.log("AI pattern detection completed:", generatedAlerts.length, "alerts generated")
       
     } catch (error) {
       console.error('Error in AI pattern detection:', error)
@@ -377,7 +449,7 @@ export function AlertsPanel() {
       }
     })
 
-    setAlerts(newAlerts)
+    setAlerts(newAlerts as unknown as GeneratedAlert[])
   }
 
   const getSeverityColor = (severity: string) => {
@@ -392,6 +464,23 @@ export function AlertsPanel() {
         return "bg-blue-100 text-blue-800 border-blue-200"
       default:
         return "bg-gray-100 text-gray-800 border-gray-200"
+    }
+  }
+
+  const getAlertTypeIcon = (type: string) => {
+    switch (type) {
+      case "water_contamination":
+        return <Droplets className="w-4 h-4" />
+      case "disease_outbreak":
+        return <AlertTriangle className="w-4 h-4" />
+      case "water_shortage":
+        return <Droplets className="w-4 h-4" />
+      case "infrastructure":
+        return <MapPin className="w-4 h-4" />
+      case "system":
+        return <Activity className="w-4 h-4" />
+      default:
+        return <Bell className="w-4 h-4" />
     }
   }
 
@@ -412,23 +501,54 @@ export function AlertsPanel() {
 
   const acknowledgeAlert = async (alertId: string) => {
     try {
-      await apiClient.acknowledgeAlert(alertId)
-      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "acknowledged" } : alert)))
+      const response = await apiClient.acknowledgeAlert(alertId)
+      console.log("Alert acknowledged:", response)
+      
+      // Update the alert in the state
+      setAlerts((prev) => prev.map((alert) => 
+        alert.id === alertId 
+          ? { 
+              ...alert, 
+              status: "acknowledged",
+              acknowledged: true,
+              acknowledgedAt: new Date().toISOString()
+            } 
+          : alert
+      ))
+      
+      // Refresh data to get updated analytics
+      await loadData()
     } catch (error) {
       console.error("Error acknowledging alert:", error)
-      // Fallback to local update
-      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "acknowledged" } : alert)))
+      // Show error message to user
+      alert("Failed to acknowledge alert. Please try again.")
     }
   }
 
-  const resolveAlert = async (alertId: string) => {
+  const resolveAlert = async (alertId: string, resolutionNotes?: string) => {
     try {
-      await apiClient.resolveAlert(alertId)
-      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "resolved" } : alert)))
+      const response = await apiClient.resolveAlert(alertId, resolutionNotes)
+      console.log("Alert resolved:", response)
+      
+      // Update the alert in the state
+      setAlerts((prev) => prev.map((alert) => 
+        alert.id === alertId 
+          ? { 
+              ...alert, 
+              status: "resolved",
+              resolved: true,
+              resolvedAt: new Date().toISOString(),
+              resolutionNotes
+            } 
+          : alert
+      ))
+      
+      // Refresh data to get updated analytics
+      await loadData()
     } catch (error) {
       console.error("Error resolving alert:", error)
-      // Fallback to local update
-      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "resolved" } : alert)))
+      // Show error message to user
+      alert("Failed to resolve alert. Please try again.")
     }
   }
 
@@ -502,6 +622,12 @@ export function AlertsPanel() {
         <div>
           <h1 className="text-3xl font-bold text-primary">Health Alerts</h1>
           <p className="text-muted-foreground">Monitor and respond to health emergencies</p>
+          <div className="flex items-center gap-2 mt-1">
+            <div className={`w-2 h-2 rounded-full ${isConnected() ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-xs text-gray-500">
+              {isConnected() ? 'Real-time connected' : 'Offline mode'}
+            </span>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button
@@ -776,13 +902,13 @@ export function AlertsPanel() {
                       <div className="flex items-start justify-between">
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2">
-                            {getSeverityIcon(alert.severity)}
+                            {getAlertTypeIcon(alert.type)}
                             <CardTitle className="text-lg">{alert.title}</CardTitle>
                             <Badge variant="outline" className={getSeverityColor(alert.severity)}>
                               {alert.severity.toUpperCase()}
                             </Badge>
                           </div>
-                          <CardDescription className="text-base">{alert.description}</CardDescription>
+                          <CardDescription className="text-base">{alert.message}</CardDescription>
                         </div>
                         <div className="flex space-x-2">
                           <Button
@@ -806,7 +932,7 @@ export function AlertsPanel() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
                         <div className="flex items-center space-x-2">
                           <MapPin className="w-4 h-4 text-muted-foreground" />
                           <span>
@@ -826,6 +952,28 @@ export function AlertsPanel() {
                           </span>
                         </div>
                       </div>
+                      
+                      {/* Show recommendations if available */}
+                      {alert.data?.recommendations && alert.data.recommendations.length > 0 && (
+                        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                          <h4 className="font-medium text-blue-900 mb-2">Recommendations:</h4>
+                          <ul className="text-sm text-blue-800 space-y-1">
+                            {alert.data.recommendations.map((rec: string, index: number) => (
+                              <li key={index} className="flex items-start space-x-2">
+                                <span className="text-blue-600 mt-1">•</span>
+                                <span>{rec}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {/* Show pattern analysis if available */}
+                      {alert.data?.pattern && (
+                        <div className="mt-3 p-2 bg-gray-50 rounded text-sm">
+                          <span className="font-medium">Pattern:</span> {alert.data.pattern}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -852,7 +1000,7 @@ export function AlertsPanel() {
                           <CardTitle className="text-lg">{alert.title}</CardTitle>
                           <Badge variant="secondary">Acknowledged</Badge>
                         </div>
-                        <CardDescription>{alert.description}</CardDescription>
+                        <CardDescription>{alert.message}</CardDescription>
                       </div>
                       <Button size="sm" onClick={() => resolveAlert(alert.id)}>
                         <CheckCircle className="w-4 h-4 mr-1" />
@@ -885,7 +1033,7 @@ export function AlertsPanel() {
                         Resolved
                       </Badge>
                     </div>
-                    <CardDescription>{alert.description}</CardDescription>
+                    <CardDescription>{alert.message}</CardDescription>
                   </CardHeader>
                 </Card>
               ))}

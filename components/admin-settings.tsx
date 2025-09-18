@@ -440,26 +440,26 @@ export function AdminSettings() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 px-4 sm:px-6 lg:px-8 max-w-full overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-primary">Admin Settings</h1>
-          <p className="text-muted-foreground">Configure alert thresholds, village settings, and system preferences</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary">Admin Settings</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Configure alert thresholds, village settings, and system preferences</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setShowAnalytics(!showAnalytics)} variant="outline">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={() => setShowAnalytics(!showAnalytics)} variant="outline" className="w-full sm:w-auto">
             {showAnalytics ? <EyeOff className="w-4 h-4 mr-2" /> : <BarChart3 className="w-4 h-4 mr-2" />}
             {showAnalytics ? "Hide Analytics" : "Show Analytics"}
           </Button>
-          <Button onClick={exportSettings} variant="outline">
+          <Button onClick={exportSettings} variant="outline" className="w-full sm:w-auto">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button onClick={resetToDefaults} variant="outline">
+          <Button onClick={resetToDefaults} variant="outline" className="w-full sm:w-auto">
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
           </Button>
-          <Button onClick={saveSettings} disabled={!hasChanges}>
+          <Button onClick={saveSettings} disabled={!hasChanges} className="w-full sm:w-auto">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
@@ -468,7 +468,7 @@ export function AdminSettings() {
 
       {/* Analytics Section */}
       {showAnalytics && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -511,17 +511,17 @@ export function AdminSettings() {
         </div>
       )}
 
-      <Tabs defaultValue="alert-rules" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="alert-rules">Alert Rules</TabsTrigger>
-          <TabsTrigger value="village-settings">Village Settings</TabsTrigger>
-          <TabsTrigger value="system-settings">System Settings</TabsTrigger>
-          <TabsTrigger value="ai-ml">AI/ML Config</TabsTrigger>
-          <TabsTrigger value="water-quality">Water Quality</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+      <Tabs defaultValue="alert-rules" className="space-y-4 w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
+          <TabsTrigger value="alert-rules" className="text-xs sm:text-sm">Alert Rules</TabsTrigger>
+          <TabsTrigger value="village-settings" className="text-xs sm:text-sm">Village Settings</TabsTrigger>
+          <TabsTrigger value="system-settings" className="text-xs sm:text-sm">System Settings</TabsTrigger>
+          <TabsTrigger value="ai-ml" className="text-xs sm:text-sm">AI/ML Config</TabsTrigger>
+          <TabsTrigger value="water-quality" className="text-xs sm:text-sm">Water Quality</TabsTrigger>
+          <TabsTrigger value="notifications" className="text-xs sm:text-sm">Notifications</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="alert-rules" className="space-y-4">
+        <TabsContent value="alert-rules" className="space-y-4 px-0 sm:px-2">
           {/* Add New Rule Section */}
           <Card>
             <CardHeader>
@@ -533,34 +533,36 @@ export function AdminSettings() {
                 Create custom alert rules for specific health conditions
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="new-rule-name">Rule Name</Label>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-rule-name" className="text-sm font-medium">Rule Name</Label>
                   <Input
                     id="new-rule-name"
                     placeholder="Enter rule name"
                     value={newRule.name || ""}
                     onChange={(e) => setNewRule(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="new-rule-threshold">Threshold</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="new-rule-threshold" className="text-sm font-medium">Threshold</Label>
                   <Input
                     id="new-rule-threshold"
                     type="number"
                     placeholder="Enter threshold"
                     value={newRule.threshold || ""}
                     onChange={(e) => setNewRule(prev => ({ ...prev, threshold: parseInt(e.target.value) }))}
+                    className="w-full"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="new-rule-severity">Severity</Label>
+                <div className="space-y-2 sm:col-span-2 lg:col-span-1">
+                  <Label htmlFor="new-rule-severity" className="text-sm font-medium">Severity</Label>
                   <Select
                     value={newRule.severity || "medium"}
                     onValueChange={(value) => setNewRule(prev => ({ ...prev, severity: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -572,19 +574,22 @@ export function AdminSettings() {
                   </Select>
                 </div>
               </div>
-              <div>
-                <Label htmlFor="new-rule-description">Description</Label>
+              <div className="space-y-2">
+                <Label htmlFor="new-rule-description" className="text-sm font-medium">Description</Label>
                 <Textarea
                   id="new-rule-description"
                   placeholder="Describe the alert condition"
                   value={newRule.description || ""}
                   onChange={(e) => setNewRule(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full min-h-[100px]"
                 />
               </div>
-              <Button onClick={addNewRule} className="w-full">
-                <Plus className="w-4 h-4 mr-2" />
-                Add New Rule
-              </Button>
+              <div className="flex justify-center sm:justify-start">
+                <Button onClick={addNewRule} className="w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Rule
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -600,49 +605,52 @@ export function AdminSettings() {
             </CardHeader>
             <CardContent className="space-y-6">
               {alertRules.map((rule) => (
-                <div key={rule.id} className="border rounded-lg p-4 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold">{rule.name}</h3>
-                      <p className="text-sm text-muted-foreground">{rule.description}</p>
+                <div key={rule.id} className="border rounded-lg p-4 sm:p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base sm:text-lg">{rule.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1 break-words">{rule.description}</p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant={getSeverityColor(rule.severity)}>
+                    <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-3">
+                      <Badge variant={getSeverityColor(rule.severity)} className="text-xs">
                         {rule.severity.toUpperCase()}
                       </Badge>
-                      <Switch
-                        checked={rule.isActive}
-                        onCheckedChange={(checked) => updateAlertRule(rule.id, 'isActive', checked)}
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteRule(rule.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={rule.isActive}
+                          onCheckedChange={(checked) => updateAlertRule(rule.id, 'isActive', checked)}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteRule(rule.id)}
+                          className="text-red-600 hover:text-red-700 p-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor={`threshold-${rule.id}`}>Threshold</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <Label htmlFor={`threshold-${rule.id}`} className="text-sm font-medium">Threshold</Label>
                       <Input
                         id={`threshold-${rule.id}`}
                         type="number"
                         value={rule.threshold}
                         onChange={(e) => updateAlertRule(rule.id, 'threshold', parseInt(e.target.value))}
                         min="1"
+                        className="w-full"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor={`severity-${rule.id}`}>Severity Level</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor={`severity-${rule.id}`} className="text-sm font-medium">Severity Level</Label>
                       <Select
                         value={rule.severity}
                         onValueChange={(value) => updateAlertRule(rule.id, 'severity', value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -653,13 +661,13 @@ export function AdminSettings() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor={`condition-${rule.id}`}>Condition</Label>
+                    <div className="space-y-2 sm:col-span-2 lg:col-span-1">
+                      <Label htmlFor={`condition-${rule.id}`} className="text-sm font-medium">Condition</Label>
                       <Select
                         value={rule.condition}
                         onValueChange={(value) => updateAlertRule(rule.id, 'condition', value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -676,7 +684,7 @@ export function AdminSettings() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="village-settings" className="space-y-4">
+        <TabsContent value="village-settings" className="space-y-4 px-0 sm:px-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -707,7 +715,7 @@ export function AdminSettings() {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                       <Label htmlFor={`severity-${village.name}`}>Severity Level</Label>
                       <Select
@@ -763,7 +771,7 @@ export function AdminSettings() {
 
         </TabsContent>
 
-        <TabsContent value="system-settings" className="space-y-4">
+        <TabsContent value="system-settings" className="space-y-4 px-0 sm:px-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -775,7 +783,7 @@ export function AdminSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="default-outbreak-threshold">Default Outbreak Threshold</Label>
                   <Input
@@ -855,7 +863,7 @@ export function AdminSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="session-timeout">Session Timeout (minutes)</Label>
                   <Input
@@ -903,7 +911,7 @@ export function AdminSettings() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="notifications" className="space-y-4">
+        <TabsContent value="notifications" className="space-y-4 px-0 sm:px-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -986,7 +994,7 @@ export function AdminSettings() {
         </TabsContent>
 
         {/* AI/ML Configuration Tab */}
-        <TabsContent value="ai-ml" className="space-y-4">
+        <TabsContent value="ai-ml" className="space-y-4 px-0 sm:px-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -1060,7 +1068,7 @@ export function AdminSettings() {
 
                 <div className="space-y-2">
                   <Label>Pattern Detection Features</Label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
                       <Switch
                         checked={systemSettings.ai?.features?.outbreakPrediction || false}
@@ -1133,7 +1141,7 @@ export function AdminSettings() {
         </TabsContent>
 
         {/* Water Quality Monitoring Tab */}
-        <TabsContent value="water-quality" className="space-y-4">
+        <TabsContent value="water-quality" className="space-y-4 px-0 sm:px-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -1182,7 +1190,7 @@ export function AdminSettings() {
 
                 <div className="space-y-2">
                   <Label>Water Quality Parameters</Label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
                       <Switch
                         checked={systemSettings.waterQuality?.parameters?.turbidity || false}

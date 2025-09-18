@@ -113,7 +113,7 @@ alertSchema.index({ priority: 1 })
 
 // Virtual for alert ID
 alertSchema.virtual('id').get(function() {
-  return this._id.toHexString()
+  return this._id.toString()
 })
 
 // Pre-save middleware to set priority based on severity

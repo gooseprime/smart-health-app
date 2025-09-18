@@ -1,0 +1,345 @@
+2025-09-18 19:51:22:5122 [31merror[39m: [31mMongoDB connection failed: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017[39m
+2025-09-18 19:51:27:5127 [31merror[39m: [31mMongoDB connection failed: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017[39m
+2025-09-18 19:51:50:5150 [33mwarn[39m: [33mMongoDB connection failed, running in offline mode: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017[39m
+2025-09-18 19:51:50:5150 [32minfo[39m: [32mDatabase connected successfully[39m
+2025-09-18 19:51:50:5150 [32minfo[39m: [32mServer running on port 5000[39m
+2025-09-18 19:51:50:5150 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-18 19:51:50:5150 [32minfo[39m: [32mHealth check: http://localhost:5000/health[39m
+2025-09-18 19:51:50:5150 [32minfo[39m: [32mClient connected: E9mYMOrUTPoIPPKNAAAB[39m
+2025-09-18 19:51:50:5150 [32minfo[39m: [32mClient connected: PpT53iaobBj6smpjAAAD[39m
+2025-09-18 19:51:52:5152 [32minfo[39m: [32mClient connected: ISGTKq7xV-vQqnt9AAAF[39m
+2025-09-18 19:51:54:5154 [33mwarn[39m: [33mMongoDB connection failed, running in offline mode: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017[39m
+2025-09-18 19:51:56:5156 [32minfo[39m: [32mClient connected: p8QUj0bjx_697KXxAAAH[39m
+2025-09-18 19:51:58:5158 [32minfo[39m: [32mClient connected: UcfffuO3d1mgxIiCAAAJ[39m
+2025-09-18 19:51:59:5159 [32minfo[39m: [32mClient connected: rxvuxkXxSPHJyPyEAAAL[39m
+2025-09-18 19:52:44:5244 [33mwarn[39m: [33mMongoDB connection failed, running in offline mode: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017[39m
+2025-09-18 19:52:44:5244 [32minfo[39m: [32mDatabase connected successfully[39m
+2025-09-18 19:52:44:5244 [32minfo[39m: [32mServer running on port 5000[39m
+2025-09-18 19:52:44:5244 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-18 19:52:44:5244 [32minfo[39m: [32mHealth check: http://localhost:5000/health[39m
+2025-09-18 19:52:45:5245 [32minfo[39m: [32mClient connected: ZfgG69922sOgIB4gAAAB[39m
+2025-09-18 19:52:46:5246 [32minfo[39m: [32mClient connected: ZV2QzvJuNg17O7orAAAD[39m
+2025-09-18 19:52:46:5246 [32minfo[39m: [32mClient connected: y7NBuM8tyT6rGaecAAAF[39m
+2025-09-18 19:52:48:5248 [32minfo[39m: [32mClient connected: Veh7vlRNBZYp283LAAAH[39m
+2025-09-18 19:52:51:5251 [32minfo[39m: [32mClient connected: KiPQ-uiZa8wHp1ZkAAAJ[39m
+2025-09-18 19:52:51:5251 [32minfo[39m: [32mClient connected: M5HBSRtafjQI8yIXAAAL[39m
+2025-09-18 19:52:56:5256 [32minfo[39m: [32mSIGINT received, shutting down gracefully[39m
+2025-09-18 19:53:14:5314 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:14:5314 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:16:5316 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:16:5316 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:18:5318 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:18:5318 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:18:5318 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:21:5321 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:21:5321 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:21:5321 [32minfo[39m: [32mAdmin joined admin room[39m
+2025-09-18 19:53:28:5328 [33mwarn[39m: [33mMongoDB connection failed, running in offline mode: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32mDatabase connected successfully[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32mServer running on port 5000[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32mHealth check: http://localhost:5000/health[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/alerts?page=1&limit=100&acknowledged=false&resolved=false HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/reports?page=1&limit=100 HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/admin/alert-rules HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/alerts/stats HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/alerts/stats HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/alerts?page=1&limit=100&acknowledged=false&resolved=false HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/reports?page=1&limit=100 HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/admin/alert-rules HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/alerts/stats HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/reports?page=1&limit=100 HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/admin/alert-rules HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:53:28:5328 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:53:28:5328 [32minfo[39m: [32m::ffff:127.0.0.1 - - [18/Sep/2025:14:23:28 +0000] "GET /api/alerts?page=1&limit=100&acknowledged=false&resolved=false HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:54:19:5419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:54:19:5419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:24:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:54:19:5419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:54:19:5419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:24:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:55:19:5519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:55:19:5519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:25:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:55:19:5519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:55:19:5519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:25:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:56:19:5619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:56:19:5619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:26:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:56:19:5619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:56:19:5619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:26:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:57:19:5719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:57:19:5719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:27:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:57:19:5719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:57:19:5719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:27:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:58:19:5819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:58:19:5819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:28:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:58:19:5819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:58:19:5819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:28:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:59:19:5919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:59:19:5919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:29:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 19:59:19:5919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 19:59:19:5919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:29:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:00:19:019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:00:19:019 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:30:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:00:19:019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:00:19:019 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:30:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:01:19:119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:01:19:119 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:31:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:01:19:119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:01:19:119 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:31:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:02:19:219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:02:19:219 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:32:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:02:19:219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:02:19:219 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:32:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:03:19:319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:03:19:319 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:33:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:03:19:319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:03:19:319 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:33:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:04:19:419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:04:19:419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:34:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:04:19:419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:04:19:419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:34:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:05:19:519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:05:19:519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:35:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:05:19:519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:05:19:519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:35:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:06:19:619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:06:19:619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:36:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:06:19:619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:06:19:619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:36:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:07:19:719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:07:19:719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:37:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:07:19:719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:07:19:719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:37:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:08:19:819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:08:19:819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:38:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:08:19:819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:08:19:819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:38:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:09:19:919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:09:19:919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:39:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:09:19:919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:09:19:919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:39:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:10:19:1019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:10:19:1019 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:40:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:10:19:1019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:10:19:1019 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:40:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:11:19:1119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:11:19:1119 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:41:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:11:19:1119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:11:19:1119 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:41:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:11:23:1123 [32minfo[39m: [32mSIGINT received, shutting down gracefully[39m
+2025-09-18 20:12:19:1219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:12:19:1219 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:42:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:12:19:1219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:12:19:1219 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:42:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:13:19:1319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:13:19:1319 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:43:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:13:19:1319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:13:19:1319 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:43:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:14:19:1419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:14:19:1419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:44:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:14:19:1419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:14:19:1419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:44:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:15:19:1519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:15:19:1519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:45:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:15:19:1519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:15:19:1519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:45:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:16:19:1619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:16:19:1619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:46:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:16:19:1619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:16:19:1619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:46:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:17:19:1719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:17:19:1719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:47:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:17:19:1719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:17:19:1719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:47:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:18:19:1819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:18:19:1819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:48:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:18:19:1819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:18:19:1819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:48:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:19:19:1919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:19:19:1919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:49:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:19:19:1919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:19:19:1919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:49:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:20:19:2019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:20:19:2019 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:50:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:20:19:2019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:20:19:2019 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:50:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:21:19:2119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:21:19:2119 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:51:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:21:19:2119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:21:19:2119 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:51:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:22:19:2219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:22:19:2219 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:52:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:22:19:2219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:22:19:2219 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:52:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:23:19:2319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:23:19:2319 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:53:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:23:19:2319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:23:19:2319 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:53:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:24:19:2419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:24:19:2419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:54:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:24:19:2419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:24:19:2419 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:54:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:25:19:2519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:25:19:2519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:55:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:25:19:2519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:25:19:2519 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:55:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:26:19:2619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:26:19:2619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:56:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:26:19:2619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:26:19:2619 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:56:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:27:19:2719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:27:19:2719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:57:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:27:19:2719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:27:19:2719 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:57:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:28:19:2819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:28:19:2819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:58:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:28:19:2819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:28:19:2819 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:58:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:29:19:2919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:29:19:2919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:59:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:29:19:2919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:29:19:2919 [32minfo[39m: [32m::1 - - [18/Sep/2025:14:59:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:30:19:3019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:30:19:3019 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:00:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:30:19:3019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:30:19:3019 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:00:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:31:19:3119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:31:19:3119 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:01:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:31:19:3119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:31:19:3119 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:01:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:32:19:3219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:32:19:3219 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:02:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:32:19:3219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:32:19:3219 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:02:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:33:19:3319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:33:19:3319 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:03:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:33:19:3319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:33:19:3319 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:03:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:34:19:3419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:34:19:3419 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:04:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:34:19:3419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:34:19:3419 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:04:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:35:19:3519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:35:19:3519 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:05:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:35:19:3519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:35:19:3519 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:05:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:36:19:3619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:36:19:3619 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:06:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:36:19:3619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:36:19:3619 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:06:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:37:19:3719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:37:19:3719 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:07:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:37:19:3719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:37:19:3719 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:07:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:38:19:3819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:38:19:3819 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:08:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:38:19:3819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:38:19:3819 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:08:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:39:19:3919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:39:19:3919 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:09:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:39:19:3919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:39:19:3919 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:09:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:40:19:4019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:40:19:4019 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:10:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:40:19:4019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:40:19:4019 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:10:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:41:19:4119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:41:19:4119 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:11:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:41:19:4119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:41:19:4119 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:11:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:42:19:4219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:42:19:4219 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:12:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:42:19:4219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:42:19:4219 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:12:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:43:19:4319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:43:19:4319 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:13:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:43:19:4319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:43:19:4319 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:13:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:44:19:4419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:44:19:4419 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:14:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:44:19:4419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:44:19:4419 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:14:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:45:19:4519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:45:19:4519 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:15:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:45:19:4519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:45:19:4519 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:15:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:46:19:4619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:46:19:4619 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:16:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:46:19:4619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:46:19:4619 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:16:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:47:19:4719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:47:19:4719 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:17:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:47:19:4719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:47:19:4719 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:17:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:48:19:4819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:48:19:4819 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:18:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:48:19:4819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:48:19:4819 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:18:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:49:19:4919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:49:19:4919 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:19:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:49:19:4919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:49:19:4919 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:19:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:50:19:5019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:50:19:5019 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:20:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:50:19:5019 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:50:19:5019 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:20:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:51:19:5119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:51:19:5119 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:21:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:51:19:5119 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:51:19:5119 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:21:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:52:19:5219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:52:19:5219 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:22:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:52:19:5219 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:52:19:5219 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:22:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:53:19:5319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:53:19:5319 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:23:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:53:19:5319 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:53:19:5319 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:23:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:54:19:5419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:54:19:5419 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:24:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:54:19:5419 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:54:19:5419 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:24:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:55:19:5519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:55:19:5519 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:25:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:55:19:5519 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:55:19:5519 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:25:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:56:19:5619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:56:19:5619 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:26:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:56:19:5619 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:56:19:5619 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:26:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:57:19:5719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:57:19:5719 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:27:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:57:19:5719 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:57:19:5719 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:27:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:58:19:5819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:58:19:5819 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:28:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:58:19:5819 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:58:19:5819 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:28:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:59:19:5919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:59:19:5919 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:29:19 +0000] "GET /api/reports HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 20:59:19:5919 [31merror[39m: [31mError occurred: Access denied. No token provided.[39m
+2025-09-18 20:59:19:5919 [32minfo[39m: [32m::1 - - [18/Sep/2025:15:29:19 +0000] "GET /api/alerts HTTP/1.1" 401 88 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"[39m
+2025-09-18 21:04:06:46 [32minfo[39m: [32mClient disconnected: ZfgG69922sOgIB4gAAAB[39m
+2025-09-18 21:04:06:46 [32minfo[39m: [32mClient disconnected: ZV2QzvJuNg17O7orAAAD[39m
+2025-09-18 21:10:21:1021 [33mwarn[39m: [33mMongoDB connection failed, running in offline mode: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017[39m
+2025-09-18 21:10:21:1021 [32minfo[39m: [32mDatabase connected successfully[39m
+2025-09-18 21:10:21:1021 [32minfo[39m: [32mServer running on port 5000[39m
+2025-09-18 21:10:21:1021 [32minfo[39m: [32mEnvironment: development[39m
+2025-09-18 21:10:21:1021 [32minfo[39m: [32mHealth check: http://localhost:5000/health[39m
+2025-09-18 21:10:21:1021 [32minfo[39m: [32mClient connected: INbRwqjOYsYCcZNTAAAB[39m
+2025-09-18 21:10:22:1022 [32minfo[39m: [32mClient connected: 7EUV-Bg_DOqHCTIPAAAD[39m
+2025-09-18 21:18:26:1826 [32minfo[39m: [32mClient disconnected: INbRwqjOYsYCcZNTAAAB[39m
+2025-09-18 21:18:26:1826 [32minfo[39m: [32mClient disconnected: 7EUV-Bg_DOqHCTIPAAAD[39m

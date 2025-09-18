@@ -91,7 +91,7 @@ userSchema.methods.comparePassword = async function(candidatePassword: string): 
 
 // Virtual for user ID
 userSchema.virtual('id').get(function() {
-  return this._id.toHexString()
+  return this._id.toString()
 })
 
 export const User = mongoose.model<IUser>('User', userSchema)

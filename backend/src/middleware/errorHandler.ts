@@ -56,7 +56,7 @@ export const errorHandler = (
   } else if (error.name === 'CastError') {
     statusCode = 400
     message = 'Invalid ID format'
-  } else if (error.name === 'MongoError' && error.code === 11000) {
+  } else if (error.name === 'MongoError' && (error as any).code === 11000) {
     statusCode = 409
     message = 'Duplicate field value'
     // Extract duplicate field
@@ -79,9 +79,9 @@ export const errorHandler = (
   if (Array.isArray(error) && error.length > 0 && error[0].msg) {
     statusCode = 400
     message = 'Validation failed'
-    const validationErrors = error.map((err: ValidationError) => ({
-      field: err.param,
-      message: err.msg,
+    const validationErrors = error.map((err: any) => ({
+      field: err.param || err.path,
+      message: err.msg || err.message,
       value: err.value
     }))
     res.status(statusCode).json({

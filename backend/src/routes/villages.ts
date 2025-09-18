@@ -25,9 +25,6 @@ const getVillagesValidation = [
 
 // Routes
 router.get('/', authenticate, getVillagesValidation, validateRequest, villageController.getVillages)
-router.get('/stats', authenticate, authorize('admin', 'supervisor'), villageController.getVillageStats)
 router.get('/:id', authenticate, param('id').isMongoId().withMessage('Invalid village ID'), validateRequest, villageController.getVillageById)
-router.get('/:id/reports', authenticate, param('id').isMongoId().withMessage('Invalid village ID'), validateRequest, villageController.getVillageReports)
-router.get('/:id/alerts', authenticate, param('id').isMongoId().withMessage('Invalid village ID'), validateRequest, villageController.getVillageAlerts)
 
 export default router

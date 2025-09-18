@@ -376,9 +376,9 @@ export class ReportService {
           report.severity,
           report.village,
           report.status,
-          report.submittedBy?.name || '',
+          (report.submittedBy as any)?.name || '',
           report.submittedAt.toISOString(),
-          report.reviewedBy?.name || '',
+          (report.reviewedBy as any)?.name || '',
           report.reviewedAt?.toISOString() || '',
           report.notes || ''
         ])

@@ -290,19 +290,19 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-6 lg:px-8 max-w-full overflow-x-hidden">
       {/* Clean Header */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="space-y-2">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+          <div className="space-y-2 flex-1 min-w-0">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-lg">
-                <BarChart3 className="w-6 h-6 text-blue-600" />
+                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">Health Dashboard</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Health Dashboard</h1>
             </div>
-            <p className="text-gray-600 text-lg">Monitor community health trends and water quality in real-time</p>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+            <p className="text-gray-600 text-base sm:text-lg">Monitor community health trends and water quality in real-time</p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-500">
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
                 Last updated: {new Date().toLocaleTimeString()}
@@ -313,26 +313,26 @@ export function Dashboard() {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Button 
               onClick={refreshData} 
               variant="outline" 
               size="sm"
               disabled={isRefreshing}
-              className="border-gray-300 hover:border-blue-600 hover:bg-blue-50"
+              className="w-full sm:w-auto border-gray-300 hover:border-blue-600 hover:bg-blue-50"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button onClick={loadDataFromAPI} variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
+            <Button onClick={loadDataFromAPI} variant="outline" size="sm" className="w-full sm:w-auto border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Activity className="w-4 h-4 mr-2" />
               Load Data
             </Button>
-            <Button onClick={() => exportReports('csv')} variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
+            <Button onClick={() => exportReports('csv')} variant="outline" size="sm" className="w-full sm:w-auto border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Download className="w-4 h-4 mr-2" />
               CSV
             </Button>
-            <Button onClick={() => exportReports('excel')} variant="outline" size="sm" className="border-gray-300 hover:border-blue-600 hover:bg-blue-50">
+            <Button onClick={() => exportReports('excel')} variant="outline" size="sm" className="w-full sm:w-auto border-gray-300 hover:border-blue-600 hover:bg-blue-50">
               <Download className="w-4 h-4 mr-2" />
               Excel
             </Button>
@@ -341,7 +341,7 @@ export function Dashboard() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Total Reports Card */}
         <Card className="border border-gray-200 bg-white hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -439,34 +439,41 @@ export function Dashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-gray-100 p-1 rounded-lg">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <BarChart3 className="w-4 h-4" />
-              Overview
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 bg-gray-100 p-1 rounded-lg gap-1">
+            <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm">
+              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Overview</span>
+              <span className="sm:hidden">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="map" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <MapPin className="w-4 h-4" />
-              Map View
+            <TabsTrigger value="map" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm">
+              <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Map View</span>
+              <span className="sm:hidden">Map</span>
             </TabsTrigger>
-            <TabsTrigger value="symptoms" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Activity className="w-4 h-4" />
-              Symptoms
+            <TabsTrigger value="symptoms" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm">
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Symptoms</span>
+              <span className="sm:hidden">Symptoms</span>
             </TabsTrigger>
-            <TabsTrigger value="water" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Droplets className="w-4 h-4" />
-              Water Quality
+            <TabsTrigger value="water" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm">
+              <Droplets className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Water Quality</span>
+              <span className="sm:hidden">Water</span>
             </TabsTrigger>
-            <TabsTrigger value="education" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Shield className="w-4 h-4" />
-              Education
+            <TabsTrigger value="education" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm">
+              <Shield className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Education</span>
+              <span className="sm:hidden">Edu</span>
             </TabsTrigger>
-            <TabsTrigger value="languages" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <Users className="w-4 h-4" />
-              Languages
+            <TabsTrigger value="languages" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm">
+              <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Languages</span>
+              <span className="sm:hidden">Lang</span>
             </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-              <FileText className="w-4 h-4" />
-              Reports
+            <TabsTrigger value="reports" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm text-xs sm:text-sm">
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Reports</span>
+              <span className="sm:hidden">Reports</span>
             </TabsTrigger>
           </TabsList>
 

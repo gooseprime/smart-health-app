@@ -157,7 +157,7 @@ reportSchema.index({ 'location.latitude': 1, 'location.longitude': 1 })
 
 // Virtual for report ID
 reportSchema.virtual('id').get(function() {
-  return this._id.toHexString()
+  return this._id.toString()
 })
 
 // Pre-save middleware to set priority based on severity

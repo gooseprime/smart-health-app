@@ -8,10 +8,10 @@ export const validateRequest = (req: Request, res: Response, next: NextFunction)
   
   if (!errors.isEmpty()) {
     const errorMessages = errors.array().map(error => ({
-      field: error.type === 'field' ? (error as any).path : error.param,
+      field: error.type === 'field' ? (error as any).path : (error as any).param,
       message: error.msg,
-      value: error.type === 'field' ? (error as any).value : error.value,
-      location: error.location
+      value: error.type === 'field' ? (error as any).value : (error as any).value,
+      location: (error as any).location
     }))
     
     logger.warn('Validation failed:', {

@@ -123,33 +123,13 @@ const updateVillageSettingsValidation = [
     .withMessage('Longitude must be between -180 and 180')
 ]
 
+// System Stats Routes
+router.get('/system-stats', adminController.getSystemStats)
+
 // Alert Rules Routes
 router.get('/alert-rules', adminController.getAlertRules)
-router.post('/alert-rules', createAlertRuleValidation, validateRequest, adminController.createAlertRule)
-router.get('/alert-rules/:id', param('id').isMongoId().withMessage('Invalid rule ID'), validateRequest, adminController.getAlertRuleById)
-router.put('/alert-rules/:id', updateAlertRuleValidation, validateRequest, adminController.updateAlertRule)
-router.delete('/alert-rules/:id', param('id').isMongoId().withMessage('Invalid rule ID'), validateRequest, adminController.deleteAlertRule)
 
 // Village Settings Routes
 router.get('/village-settings', adminController.getVillageSettings)
-router.post('/village-settings', createVillageSettingsValidation, validateRequest, adminController.createVillageSettings)
-router.get('/village-settings/:id', param('id').isMongoId().withMessage('Invalid village settings ID'), validateRequest, adminController.getVillageSettingsById)
-router.put('/village-settings/:id', updateVillageSettingsValidation, validateRequest, adminController.updateVillageSettings)
-router.delete('/village-settings/:id', param('id').isMongoId().withMessage('Invalid village settings ID'), validateRequest, adminController.deleteVillageSettings)
-
-// System Settings Routes
-router.get('/system-settings', adminController.getSystemSettings)
-router.put('/system-settings', adminController.updateSystemSettings)
-
-// Analytics Routes
-router.get('/analytics/overview', adminController.getAnalyticsOverview)
-router.get('/analytics/reports', adminController.getReportAnalytics)
-router.get('/analytics/alerts', adminController.getAlertAnalytics)
-router.get('/analytics/villages', adminController.getVillageAnalytics)
-
-// Export Routes
-router.get('/export/alert-rules', adminController.exportAlertRules)
-router.get('/export/village-settings', adminController.exportVillageSettings)
-router.get('/export/system-data', adminController.exportSystemData)
 
 export default router

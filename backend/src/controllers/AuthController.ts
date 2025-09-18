@@ -10,12 +10,10 @@ export class AuthController {
   // Generate JWT token
   private generateToken(userId: string): string {
     const secret = process.env.JWT_SECRET || 'fallback-secret'
-    const expiresIn = process.env.JWT_EXPIRE || '7d'
     
     return jwt.sign(
       { id: userId },
-      secret,
-      { expiresIn }
+      secret
     ) as string
   }
 
@@ -188,9 +186,8 @@ export class AuthController {
       // Generate reset token (in a real app, you'd send this via email)
       const resetToken = jwt.sign(
         { id: user._id, type: 'password_reset' },
-        (process.env.JWT_SECRET || 'fallback-secret') as string,
-        { expiresIn: '1h' }
-      )
+        process.env.JWT_SECRET || 'fallback-secret'
+      ) as string
 
       // TODO: Send email with reset link
       logger.info(`Password reset requested for: ${email}, token: ${resetToken}`)

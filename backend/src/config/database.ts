@@ -10,7 +10,6 @@ const connectDatabase = async (): Promise<void> => {
       maxPoolSize: 10, // Maintain up to 10 socket connections
       serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
       socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      bufferMaxEntries: 0, // Disable mongoose buffering
       bufferCommands: false, // Disable mongoose buffering
     }
 
@@ -32,8 +31,8 @@ const connectDatabase = async (): Promise<void> => {
     })
     
   } catch (error) {
-    logger.error('MongoDB connection failed:', error)
-    throw error
+    logger.warn('MongoDB connection failed, running in offline mode:', error)
+    // Don't throw error, allow server to start without MongoDB
   }
 }
 

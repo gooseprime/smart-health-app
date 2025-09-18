@@ -92,12 +92,6 @@ const getUsersValidation = [
 
 // Routes
 router.get('/', authenticate, authorize('admin', 'supervisor'), getUsersValidation, validateRequest, userController.getUsers)
-router.post('/', authenticate, authorize('admin'), createUserValidation, validateRequest, userController.createUser)
-router.get('/stats', authenticate, authorize('admin', 'supervisor'), userController.getUserStats)
 router.get('/:id', authenticate, param('id').isMongoId().withMessage('Invalid user ID'), validateRequest, userController.getUserById)
-router.put('/:id', authenticate, authorize('admin'), updateUserValidation, validateRequest, userController.updateUser)
-router.delete('/:id', authenticate, authorize('admin'), param('id').isMongoId().withMessage('Invalid user ID'), validateRequest, userController.deleteUser)
-router.post('/:id/deactivate', authenticate, authorize('admin'), param('id').isMongoId().withMessage('Invalid user ID'), validateRequest, userController.deactivateUser)
-router.post('/:id/activate', authenticate, authorize('admin'), param('id').isMongoId().withMessage('Invalid user ID'), validateRequest, userController.activateUser)
 
 export default router

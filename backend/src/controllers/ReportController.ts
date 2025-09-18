@@ -5,6 +5,8 @@ import { logger } from '../utils/logger'
 import { AuthRequest } from '../middleware/auth'
 import { validate } from '../middleware/validateRequest'
 import { reportService, ReportFilters, PaginationOptions } from '../services/ReportService'
+import { Report } from '../models/Report'
+import { Alert } from '../models/Alert'
 
 export class ReportController {
   // Validation methods
@@ -420,9 +422,9 @@ export class ReportController {
           report.severity,
           report.village,
           report.status,
-          report.submittedBy?.name || '',
+          (report.submittedBy as any)?.name || '',
           report.submittedAt.toISOString(),
-          report.reviewedBy?.name || '',
+          (report.reviewedBy as any)?.name || '',
           report.reviewedAt?.toISOString() || '',
           report.notes || ''
         ])
