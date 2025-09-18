@@ -5,7 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertTriangle, Bell, CheckCircle, Clock, MapPin, TrendingUp, Users, Zap } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { AlertTriangle, Bell, CheckCircle, Clock, MapPin, TrendingUp, Users, Zap, Search, Filter, Download, RefreshCw, Eye, EyeOff, Calendar, BarChart3, Activity, AlertCircle } from "lucide-react"
+import { apiClient } from "@/lib/api"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts"
 
 interface AlertRule {
   id: string
@@ -73,13 +77,45 @@ export function AlertsPanel() {
   const [alerts, setAlerts] = useState<HealthAlert[]>([])
   const [alertRules, setAlertRules] = useState<AlertRule[]>(defaultAlertRules)
   const [reports, setReports] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [severityFilter, setSeverityFilter] = useState<string>("all")
+  const [villageFilter, setVillageFilter] = useState<string>("all")
+  const [dateRange, setDateRange] = useState<string>("7")
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [autoRefresh, setAutoRefresh] = useState(true)
 
   useEffect(() => {
-    // Load reports and generate alerts
-    const storedReports = JSON.parse(localStorage.getItem("health-reports") || "[]")
-    setReports(storedReports)
-    generateAlerts(storedReports)
-  }, [])
+    loadData()
+    
+    // Auto-refresh every 30 seconds if enabled
+    const interval = setInterval(() => {
+      if (autoRefresh) {
+        loadData()
+      }
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [autoRefresh])
+
+  const loadData = async () => {
+    setIsLoading(true)
+    try {
+      const [reportsData, alertsData] = await Promise.all([
+        apiClient.getReports(),
+        apiClient.getAlerts()
+      ])
+      setReports(reportsData)
+      setAlerts(alertsData)
+    } catch (error) {
+      console.error("Error loading data:", error)
+      // Fallback to localStorage
+      const storedReports = JSON.parse(localStorage.getItem("health-reports") || "[]")
+      setReports(storedReports)
+      generateAlerts(storedReports)
+    }
+    setIsLoading(false)
+  }
 
   const generateAlerts = (reportData: any[]) => {
     const newAlerts: HealthAlert[] = []
@@ -200,12 +236,79 @@ export function AlertsPanel() {
     }
   }
 
-  const acknowledgeAlert = (alertId: string) => {
-    setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "acknowledged" } : alert)))
+  const acknowledgeAlert = async (alertId: string) => {
+    try {
+      await apiClient.acknowledgeAlert(alertId)
+      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "acknowledged" } : alert)))
+    } catch (error) {
+      console.error("Error acknowledging alert:", error)
+      // Fallback to local update
+      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "acknowledged" } : alert)))
+    }
   }
 
-  const resolveAlert = (alertId: string) => {
-    setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "resolved" } : alert)))
+  const resolveAlert = async (alertId: string) => {
+    try {
+      await apiClient.resolveAlert(alertId)
+      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "resolved" } : alert)))
+    } catch (error) {
+      console.error("Error resolving alert:", error)
+      // Fallback to local update
+      setAlerts((prev) => prev.map((alert) => (alert.id === alertId ? { ...alert, status: "resolved" } : alert)))
+    }
+  }
+
+  const exportAlerts = async () => {
+    try {
+      const blob = await apiClient.exportReports('csv')
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `health-alerts-${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error("Error exporting alerts:", error)
+    }
+  }
+
+  // Filter alerts based on search and filters
+  const filteredAlerts = alerts.filter(alert => {
+    const matchesSearch = alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         alert.village.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSeverity = severityFilter === "all" || alert.severity === severityFilter
+    const matchesVillage = villageFilter === "all" || alert.village === villageFilter
+    const matchesDateRange = new Date(alert.createdAt) > new Date(Date.now() - parseInt(dateRange) * 24 * 60 * 60 * 1000)
+    
+    return matchesSearch && matchesSeverity && matchesVillage && matchesDateRange
+  })
+
+  // Get unique villages for filter
+  const uniqueVillages = Array.from(new Set(alerts.map(alert => alert.village)))
+
+  // Analytics data
+  const alertAnalytics = {
+    severityDistribution: [
+      { name: 'Critical', value: alerts.filter(a => a.severity === 'critical').length, color: '#ef4444' },
+      { name: 'High', value: alerts.filter(a => a.severity === 'high').length, color: '#f97316' },
+      { name: 'Medium', value: alerts.filter(a => a.severity === 'medium').length, color: '#eab308' },
+      { name: 'Low', value: alerts.filter(a => a.severity === 'low').length, color: '#22c55e' }
+    ],
+    villageDistribution: uniqueVillages.map(village => ({
+      name: village,
+      alerts: alerts.filter(a => a.village === village).length
+    })),
+    timelineData: Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000)
+      return {
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        alerts: alerts.filter(a => 
+          new Date(a.createdAt).toDateString() === date.toDateString()
+        ).length
+      }
+    })
   }
 
   const activeAlerts = alerts.filter((alert) => alert.status === "active")
@@ -223,15 +326,173 @@ export function AlertsPanel() {
           <h1 className="text-3xl font-bold text-primary">Health Alerts</h1>
           <p className="text-muted-foreground">Monitor and respond to health emergencies</p>
         </div>
-        <Button
-          onClick={() => generateAlerts(reports)}
-          variant="outline"
-          className="transition-all duration-200 hover:scale-105"
-        >
-          <Bell className="w-4 h-4 mr-2" />
-          Refresh Alerts
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowAnalytics(!showAnalytics)}
+            variant="outline"
+            className="transition-all duration-200 hover:scale-105"
+          >
+            {showAnalytics ? <EyeOff className="w-4 h-4 mr-2" /> : <BarChart3 className="w-4 h-4 mr-2" />}
+            {showAnalytics ? "Hide Analytics" : "Show Analytics"}
+          </Button>
+          <Button
+            onClick={exportAlerts}
+            variant="outline"
+            className="transition-all duration-200 hover:scale-105"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Button
+            onClick={loadData}
+            variant="outline"
+            className="transition-all duration-200 hover:scale-105"
+            disabled={isLoading}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {/* Enhanced Controls */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Filter className="w-5 h-5" />
+            <span>Filter & Search</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search alerts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Severity</label>
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All severities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Severities</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Village</label>
+              <Select value={villageFilter} onValueChange={setVillageFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All villages" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Villages</SelectItem>
+                  {uniqueVillages.map(village => (
+                    <SelectItem key={village} value={village}>{village}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Date Range</label>
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Last 24 hours</SelectItem>
+                  <SelectItem value="7">Last 7 days</SelectItem>
+                  <SelectItem value="30">Last 30 days</SelectItem>
+                  <SelectItem value="90">Last 90 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="auto-refresh"
+                checked={autoRefresh}
+                onChange={(e) => setAutoRefresh(e.target.checked)}
+                className="rounded"
+              />
+              <label htmlFor="auto-refresh" className="text-sm text-muted-foreground">
+                Auto-refresh every 30 seconds
+              </label>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Showing {filteredAlerts.length} of {alerts.length} alerts
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Analytics Section */}
+      {showAnalytics && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <BarChart3 className="w-5 h-5" />
+                <span>Alert Timeline</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={alertAnalytics.timelineData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="alerts" stroke="#8884d8" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Activity className="w-5 h-5" />
+                <span>Severity Distribution</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={alertAnalytics.severityDistribution}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {alertAnalytics.severityDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Alert Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -301,7 +562,17 @@ export function AlertsPanel() {
         </TabsList>
 
         <TabsContent value="active" className="space-y-4">
-          {activeAlerts.length === 0 ? (
+          {isLoading ? (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <RefreshCw className="w-16 h-16 text-primary mx-auto animate-spin" />
+                  <h3 className="text-xl font-semibold">Loading alerts...</h3>
+                  <p className="text-muted-foreground">Please wait while we fetch the latest data.</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : filteredAlerts.filter(alert => alert.status === "active").length === 0 ? (
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center space-y-4">
@@ -313,7 +584,8 @@ export function AlertsPanel() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {activeAlerts
+              {filteredAlerts
+                .filter(alert => alert.status === "active")
                 .sort((a, b) => {
                   const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
                   return severityOrder[b.severity] - severityOrder[a.severity]
@@ -385,7 +657,7 @@ export function AlertsPanel() {
         </TabsContent>
 
         <TabsContent value="acknowledged" className="space-y-4">
-          {acknowledgedAlerts.length === 0 ? (
+          {filteredAlerts.filter(alert => alert.status === "acknowledged").length === 0 ? (
             <Card>
               <CardContent className="pt-6">
                 <p className="text-center text-muted-foreground">No acknowledged alerts</p>
@@ -393,7 +665,7 @@ export function AlertsPanel() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {acknowledgedAlerts.map((alert) => (
+              {filteredAlerts.filter(alert => alert.status === "acknowledged").map((alert) => (
                 <Card key={alert.id} className="opacity-75">
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -418,7 +690,7 @@ export function AlertsPanel() {
         </TabsContent>
 
         <TabsContent value="resolved" className="space-y-4">
-          {resolvedAlerts.length === 0 ? (
+          {filteredAlerts.filter(alert => alert.status === "resolved").length === 0 ? (
             <Card>
               <CardContent className="pt-6">
                 <p className="text-center text-muted-foreground">No resolved alerts</p>
@@ -426,7 +698,7 @@ export function AlertsPanel() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {resolvedAlerts.map((alert) => (
+              {filteredAlerts.filter(alert => alert.status === "resolved").map((alert) => (
                 <Card key={alert.id} className="opacity-50">
                   <CardHeader>
                     <div className="flex items-center space-x-2">

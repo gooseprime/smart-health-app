@@ -9,7 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertTriangle, Settings, Save, RotateCcw, MapPin, Bell } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { AlertTriangle, Settings, Save, RotateCcw, MapPin, Bell, Plus, Trash2, Edit, Download, Upload, Users, Shield, Database, Activity, BarChart3, Clock, AlertCircle } from "lucide-react"
+import { apiClient } from "@/lib/api"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts"
 
 interface AlertRule {
   id: string
@@ -154,23 +157,82 @@ const defaultVillages: VillageSettings[] = [
   }
 ]
 
+interface SystemSettings {
+  globalThresholds: {
+    defaultOutbreakThreshold: number
+    defaultWaterQualityThreshold: number
+    alertRetentionDays: number
+    syncFrequencyMinutes: number
+  }
+  notifications: {
+    emailAlerts: boolean
+    smsAlerts: boolean
+    pushNotifications: boolean
+    alertFrequency: number
+  }
+  security: {
+    sessionTimeout: number
+    requireTwoFactor: boolean
+    auditLogging: boolean
+  }
+}
+
 export function AdminSettings() {
   const [alertRules, setAlertRules] = useState<AlertRule[]>(defaultAlertRules)
   const [villageSettings, setVillageSettings] = useState<VillageSettings[]>(defaultVillages)
+  const [systemSettings, setSystemSettings] = useState<SystemSettings>({
+    globalThresholds: {
+      defaultOutbreakThreshold: 5,
+      defaultWaterQualityThreshold: 1,
+      alertRetentionDays: 30,
+      syncFrequencyMinutes: 15
+    },
+    notifications: {
+      emailAlerts: true,
+      smsAlerts: false,
+      pushNotifications: true,
+      alertFrequency: 24
+    },
+    security: {
+      sessionTimeout: 60,
+      requireTwoFactor: false,
+      auditLogging: true
+    }
+  })
   const [hasChanges, setHasChanges] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [editingRule, setEditingRule] = useState<string | null>(null)
+  const [newRule, setNewRule] = useState<Partial<AlertRule>>({})
 
   useEffect(() => {
-    // Load saved settings from localStorage
-    const savedRules = localStorage.getItem("admin-alert-rules")
-    const savedVillages = localStorage.getItem("admin-village-settings")
-    
-    if (savedRules) {
-      setAlertRules(JSON.parse(savedRules))
-    }
-    if (savedVillages) {
-      setVillageSettings(JSON.parse(savedVillages))
-    }
+    loadSettings()
   }, [])
+
+  const loadSettings = async () => {
+    setIsLoading(true)
+    try {
+      const [rulesData, villagesData] = await Promise.all([
+        apiClient.getAlertRules(),
+        apiClient.getVillageSettings()
+      ])
+      setAlertRules(rulesData)
+      setVillageSettings(villagesData)
+    } catch (error) {
+      console.error("Error loading settings:", error)
+      // Fallback to localStorage
+      const savedRules = localStorage.getItem("admin-alert-rules")
+      const savedVillages = localStorage.getItem("admin-village-settings")
+      
+      if (savedRules) {
+        setAlertRules(JSON.parse(savedRules))
+      }
+      if (savedVillages) {
+        setVillageSettings(JSON.parse(savedVillages))
+      }
+    }
+    setIsLoading(false)
+  }
 
   const updateAlertRule = (ruleId: string, field: keyof AlertRule, value: any) => {
     setAlertRules(prev => prev.map(rule => 
@@ -202,18 +264,123 @@ export function AdminSettings() {
     setHasChanges(true)
   }
 
-  const saveSettings = () => {
-    localStorage.setItem("admin-alert-rules", JSON.stringify(alertRules))
-    localStorage.setItem("admin-village-settings", JSON.stringify(villageSettings))
-    setHasChanges(false)
-    // In a real app, this would also sync to the backend
-    alert("Settings saved successfully!")
+  const saveSettings = async () => {
+    try {
+      await Promise.all([
+        apiClient.saveAlertRules(alertRules),
+        apiClient.saveVillageSettings(villageSettings)
+      ])
+      localStorage.setItem("admin-alert-rules", JSON.stringify(alertRules))
+      localStorage.setItem("admin-village-settings", JSON.stringify(villageSettings))
+      setHasChanges(false)
+      alert("Settings saved successfully!")
+    } catch (error) {
+      console.error("Error saving settings:", error)
+      // Fallback to localStorage
+      localStorage.setItem("admin-alert-rules", JSON.stringify(alertRules))
+      localStorage.setItem("admin-village-settings", JSON.stringify(villageSettings))
+      setHasChanges(false)
+      alert("Settings saved locally!")
+    }
   }
 
   const resetToDefaults = () => {
     setAlertRules(defaultAlertRules)
     setVillageSettings(defaultVillages)
+    setSystemSettings({
+      globalThresholds: {
+        defaultOutbreakThreshold: 5,
+        defaultWaterQualityThreshold: 1,
+        alertRetentionDays: 30,
+        syncFrequencyMinutes: 15
+      },
+      notifications: {
+        emailAlerts: true,
+        smsAlerts: false,
+        pushNotifications: true,
+        alertFrequency: 24
+      },
+      security: {
+        sessionTimeout: 60,
+        requireTwoFactor: false,
+        auditLogging: true
+      }
+    })
     setHasChanges(true)
+  }
+
+  const addNewRule = () => {
+    if (newRule.name && newRule.description && newRule.threshold) {
+      const rule: AlertRule = {
+        id: Date.now().toString(),
+        name: newRule.name,
+        description: newRule.description,
+        condition: newRule.condition || "symptom_count",
+        threshold: newRule.threshold,
+        severity: newRule.severity || "medium",
+        isActive: true
+      }
+      setAlertRules(prev => [...prev, rule])
+      setNewRule({})
+      setHasChanges(true)
+    }
+  }
+
+  const deleteRule = (ruleId: string) => {
+    setAlertRules(prev => prev.filter(rule => rule.id !== ruleId))
+    setHasChanges(true)
+  }
+
+  const exportSettings = () => {
+    const settings = {
+      alertRules,
+      villageSettings,
+      systemSettings,
+      exportedAt: new Date().toISOString()
+    }
+    const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `admin-settings-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
+  const importSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        try {
+          const settings = JSON.parse(e.target?.result as string)
+          if (settings.alertRules) setAlertRules(settings.alertRules)
+          if (settings.villageSettings) setVillageSettings(settings.villageSettings)
+          if (settings.systemSettings) setSystemSettings(settings.systemSettings)
+          setHasChanges(true)
+          alert("Settings imported successfully!")
+        } catch (error) {
+          alert("Error importing settings. Please check the file format.")
+        }
+      }
+      reader.readAsText(file)
+    }
+  }
+
+  // Analytics data
+  const analyticsData = {
+    ruleUsage: alertRules.map(rule => ({
+      name: rule.name,
+      active: rule.isActive ? 1 : 0,
+      severity: rule.severity
+    })),
+    villageDistribution: villageSettings.map(village => ({
+      name: village.name,
+      severity: village.severity,
+      customized: village.isCustomized ? 1 : 0
+    }))
   }
 
   const getSeverityColor = (severity: string) => {
@@ -236,12 +403,20 @@ export function AdminSettings() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-primary">Admin Settings</h1>
-          <p className="text-muted-foreground">Configure alert thresholds and village-specific settings</p>
+          <p className="text-muted-foreground">Configure alert thresholds, village settings, and system preferences</p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={() => setShowAnalytics(!showAnalytics)} variant="outline">
+            {showAnalytics ? <EyeOff className="w-4 h-4 mr-2" /> : <BarChart3 className="w-4 h-4 mr-2" />}
+            {showAnalytics ? "Hide Analytics" : "Show Analytics"}
+          </Button>
+          <Button onClick={exportSettings} variant="outline">
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
           <Button onClick={resetToDefaults} variant="outline">
             <RotateCcw className="w-4 h-4 mr-2" />
-            Reset to Defaults
+            Reset
           </Button>
           <Button onClick={saveSettings} disabled={!hasChanges}>
             <Save className="w-4 h-4 mr-2" />
@@ -250,13 +425,126 @@ export function AdminSettings() {
         </div>
       </div>
 
+      {/* Analytics Section */}
+      {showAnalytics && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Activity className="w-5 h-5" />
+                <span>Alert Rules Status</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={analyticsData.ruleUsage}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="active" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <MapPin className="w-5 h-5" />
+                <span>Village Customization</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={analyticsData.villageDistribution}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="customized" fill="#22c55e" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <Tabs defaultValue="alert-rules" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="alert-rules">Alert Rules</TabsTrigger>
           <TabsTrigger value="village-settings">Village Settings</TabsTrigger>
+          <TabsTrigger value="system-settings">System Settings</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="alert-rules" className="space-y-4">
+          {/* Add New Rule Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Plus className="w-5 h-5" />
+                <span>Add New Alert Rule</span>
+              </CardTitle>
+              <CardDescription>
+                Create custom alert rules for specific health conditions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="new-rule-name">Rule Name</Label>
+                  <Input
+                    id="new-rule-name"
+                    placeholder="Enter rule name"
+                    value={newRule.name || ""}
+                    onChange={(e) => setNewRule(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="new-rule-threshold">Threshold</Label>
+                  <Input
+                    id="new-rule-threshold"
+                    type="number"
+                    placeholder="Enter threshold"
+                    value={newRule.threshold || ""}
+                    onChange={(e) => setNewRule(prev => ({ ...prev, threshold: parseInt(e.target.value) }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="new-rule-severity">Severity</Label>
+                  <Select
+                    value={newRule.severity || "medium"}
+                    onValueChange={(value) => setNewRule(prev => ({ ...prev, severity: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="critical">Critical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="new-rule-description">Description</Label>
+                <Textarea
+                  id="new-rule-description"
+                  placeholder="Describe the alert condition"
+                  value={newRule.description || ""}
+                  onChange={(e) => setNewRule(prev => ({ ...prev, description: e.target.value }))}
+                />
+              </div>
+              <Button onClick={addNewRule} className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Rule
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -283,6 +571,14 @@ export function AdminSettings() {
                         checked={rule.isActive}
                         onCheckedChange={(checked) => updateAlertRule(rule.id, 'isActive', checked)}
                       />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteRule(rule.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                   
@@ -422,19 +718,34 @@ export function AdminSettings() {
             </CardContent>
           </Card>
 
+        </TabsContent>
+
+        <TabsContent value="system-settings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Global Settings</CardTitle>
-              <CardDescription>System-wide configuration options</CardDescription>
+              <CardTitle className="flex items-center space-x-2">
+                <Settings className="w-5 h-5" />
+                <span>System Configuration</span>
+              </CardTitle>
+              <CardDescription>
+                Configure global system settings and thresholds
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="default-outbreak-threshold">Default Outbreak Threshold</Label>
                   <Input
                     id="default-outbreak-threshold"
                     type="number"
-                    defaultValue="5"
+                    value={systemSettings.globalThresholds.defaultOutbreakThreshold}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      globalThresholds: {
+                        ...prev.globalThresholds,
+                        defaultOutbreakThreshold: parseInt(e.target.value)
+                      }
+                    }))}
                     min="1"
                   />
                 </div>
@@ -443,7 +754,14 @@ export function AdminSettings() {
                   <Input
                     id="default-water-threshold"
                     type="number"
-                    defaultValue="1"
+                    value={systemSettings.globalThresholds.defaultWaterQualityThreshold}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      globalThresholds: {
+                        ...prev.globalThresholds,
+                        defaultWaterQualityThreshold: parseInt(e.target.value)
+                      }
+                    }))}
                     min="1"
                   />
                 </div>
@@ -452,7 +770,14 @@ export function AdminSettings() {
                   <Input
                     id="alert-retention"
                     type="number"
-                    defaultValue="30"
+                    value={systemSettings.globalThresholds.alertRetentionDays}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      globalThresholds: {
+                        ...prev.globalThresholds,
+                        alertRetentionDays: parseInt(e.target.value)
+                      }
+                    }))}
                     min="1"
                   />
                 </div>
@@ -461,7 +786,154 @@ export function AdminSettings() {
                   <Input
                     id="sync-frequency"
                     type="number"
-                    defaultValue="15"
+                    value={systemSettings.globalThresholds.syncFrequencyMinutes}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      globalThresholds: {
+                        ...prev.globalThresholds,
+                        syncFrequencyMinutes: parseInt(e.target.value)
+                      }
+                    }))}
+                    min="1"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Shield className="w-5 h-5" />
+                <span>Security Settings</span>
+              </CardTitle>
+              <CardDescription>
+                Configure security and access control settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="session-timeout">Session Timeout (minutes)</Label>
+                  <Input
+                    id="session-timeout"
+                    type="number"
+                    value={systemSettings.security.sessionTimeout}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      security: {
+                        ...prev.security,
+                        sessionTimeout: parseInt(e.target.value)
+                      }
+                    }))}
+                    min="5"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={systemSettings.security.requireTwoFactor}
+                    onCheckedChange={(checked) => setSystemSettings(prev => ({
+                      ...prev,
+                      security: {
+                        ...prev.security,
+                        requireTwoFactor: checked
+                      }
+                    }))}
+                  />
+                  <Label htmlFor="two-factor">Require Two-Factor Authentication</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={systemSettings.security.auditLogging}
+                    onCheckedChange={(checked) => setSystemSettings(prev => ({
+                      ...prev,
+                      security: {
+                        ...prev.security,
+                        auditLogging: checked
+                      }
+                    }))}
+                  />
+                  <Label htmlFor="audit-logging">Enable Audit Logging</Label>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Bell className="w-5 h-5" />
+                <span>Notification Settings</span>
+              </CardTitle>
+              <CardDescription>
+                Configure how and when alerts are sent to users
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="email-alerts">Email Alerts</Label>
+                    <p className="text-sm text-muted-foreground">Send alerts via email</p>
+                  </div>
+                  <Switch
+                    checked={systemSettings.notifications.emailAlerts}
+                    onCheckedChange={(checked) => setSystemSettings(prev => ({
+                      ...prev,
+                      notifications: {
+                        ...prev.notifications,
+                        emailAlerts: checked
+                      }
+                    }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="sms-alerts">SMS Alerts</Label>
+                    <p className="text-sm text-muted-foreground">Send alerts via SMS</p>
+                  </div>
+                  <Switch
+                    checked={systemSettings.notifications.smsAlerts}
+                    onCheckedChange={(checked) => setSystemSettings(prev => ({
+                      ...prev,
+                      notifications: {
+                        ...prev.notifications,
+                        smsAlerts: checked
+                      }
+                    }))}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="push-notifications">Push Notifications</Label>
+                    <p className="text-sm text-muted-foreground">Send push notifications to mobile devices</p>
+                  </div>
+                  <Switch
+                    checked={systemSettings.notifications.pushNotifications}
+                    onCheckedChange={(checked) => setSystemSettings(prev => ({
+                      ...prev,
+                      notifications: {
+                        ...prev.notifications,
+                        pushNotifications: checked
+                      }
+                    }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="alert-frequency">Alert Frequency (hours)</Label>
+                  <Input
+                    id="alert-frequency"
+                    type="number"
+                    value={systemSettings.notifications.alertFrequency}
+                    onChange={(e) => setSystemSettings(prev => ({
+                      ...prev,
+                      notifications: {
+                        ...prev.notifications,
+                        alertFrequency: parseInt(e.target.value)
+                      }
+                    }))}
                     min="1"
                   />
                 </div>
