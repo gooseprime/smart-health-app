@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Smart Health Monitor</string>
+    <string name="title_activity_main">Smart Health Monitor</string>
+    <string name="package_name">com.smarthealth.monitor</string>
+    <string name="custom_url_scheme">com.smarthealth.monitor</string>
+</resources>
