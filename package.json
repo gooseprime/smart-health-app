@@ -9,7 +9,7 @@
     "dev:full": "concurrently \"npm run dev:backend\" \"npm run dev\"",
     "lint": "next lint",
     "start": "next start",
-    "build:mobile": "NEXT_PUBLIC_API_URL=http://localhost:5000/api next build && npx cap sync",
+    "build:mobile": "set NEXT_PUBLIC_API_URL=http://localhost:5000/api && next build && npx cap sync",
     "android:dev": "npm run build:mobile && npx cap run android",
     "android:build": "npm run build:mobile && npx cap build android",
     "ios:dev": "npm run build:mobile && npx cap run ios",

@@ -9,11 +9,14 @@ import { AuthRequest } from '../middleware/auth'
 export class AuthController {
   // Generate JWT token
   private generateToken(userId: string): string {
+    const secret = process.env.JWT_SECRET || 'fallback-secret'
+    const expiresIn = process.env.JWT_EXPIRE || '7d'
+    
     return jwt.sign(
       { id: userId },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: process.env.JWT_EXPIRE || '7d' }
-    )
+      secret,
+      { expiresIn }
+    ) as string
   }
 
   // Register new user
@@ -146,7 +149,7 @@ export class AuthController {
       }
 
       // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+      const decoded = jwt.verify(token, (process.env.JWT_SECRET || 'fallback-secret') as string) as any
       const user = await User.findById(decoded.id)
 
       if (!user || !user.isActive) {
@@ -185,7 +188,7 @@ export class AuthController {
       // Generate reset token (in a real app, you'd send this via email)
       const resetToken = jwt.sign(
         { id: user._id, type: 'password_reset' },
-        process.env.JWT_SECRET || 'fallback-secret',
+        (process.env.JWT_SECRET || 'fallback-secret') as string,
         { expiresIn: '1h' }
       )
 
@@ -213,7 +216,7 @@ export class AuthController {
       }
 
       // Verify reset token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+      const decoded = jwt.verify(token, (process.env.JWT_SECRET || 'fallback-secret') as string) as any
       if (decoded.type !== 'password_reset') {
         throw createError('Invalid reset token', 400)
       }

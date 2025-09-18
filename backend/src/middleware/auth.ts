@@ -15,7 +15,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
       throw createError('Access denied. No token provided.', 401)
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+    const decoded = jwt.verify(token, (process.env.JWT_SECRET || 'fallback-secret') as string) as any
     const user = await User.findById(decoded.id).select('-password')
 
     if (!user) {
@@ -48,7 +48,7 @@ export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFu
     const token = req.header('Authorization')?.replace('Bearer ', '')
 
     if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+      const decoded = jwt.verify(token, (process.env.JWT_SECRET || 'fallback-secret') as string) as any
       const user = await User.findById(decoded.id).select('-password')
       req.user = user
     }
